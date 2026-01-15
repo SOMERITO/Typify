@@ -5,27 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typify Pro (Cloud Edition)</title>
     <style>
-        /* ESTILOS (Diseño Original v19) */
+        /* ESTILOS (Diseño Original v19 - Restaurado) */
         :root { --primary: #4f46e5; --secondary: #ec4899; --bg: #f8fafc; --text: #0f172a; --card-bg: #ffffff; --danger: #ef4444; --success: #10b981; }
         body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .header-final { width: 100%; max-width: 800px; text-align: center; margin-bottom: 40px; animation: fadeIn 0.6s ease; }
         h1 { margin: 0 0 10px 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; font-weight: 800; }
+        
         .cloud-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 5px 15px; border-radius: 20px; background: #e2e8f0; color: #64748b; margin-bottom: 25px; transition: 0.3s; }
         .cloud-status.active { background: #dcfce7; color: var(--success); }
         .cloud-status.error { background: #fee2e2; color: var(--danger); }
+        
         .contenedor-buscador-flex { display: flex; align-items: center; justify-content: center; width: 100%; gap: 20px; position: relative; }
         .input-wrapper-final { flex: 1; max-width: 700px; position: relative; }
         .icono-lupa { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 22px; height: 22px; pointer-events: none; }
         .input-busqueda-final { width: 100%; padding: 18px 25px 18px 55px; font-size: 1.2rem; border: 2px solid transparent; border-radius: 20px; background: white; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); outline: none; transition: 0.3s; color: var(--text); box-sizing: border-box; }
         .input-busqueda-final:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
+        
         .btn-borrar-final { width: 55px; height: 55px; flex-shrink: 0; background: white; border: 2px solid #ef4444; border-radius: 18px; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transform: scale(0); transition: 0.3s; }
         .btn-borrar-final.visible { visibility: visible; opacity: 1; transform: scale(1); }
         .btn-borrar-final:hover { background: #ef4444; color: white; transform: rotate(90deg); }
+        
         .chips-wrapper { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 25px; }
         .chip-final { background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: 0.2s; }
         .chip-final.active { transform: scale(1.05); color: white !important; border-color: transparent !important; }
+        
         #results { width: 100%; max-width: 800px; display: grid; gap: 20px; padding-bottom: 100px; }
         .card-final { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid white; transition: 0.3s; opacity: 0; animation: fadeIn 0.5s forwards; position: relative; overflow: hidden; }
         .card-final:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.1); }
@@ -44,8 +50,10 @@
         .card-final:hover .actions { opacity: 1; }
         .btn-action { background: #f1f5f9; border: none; padding: 8px; border-radius: 8px; cursor: pointer; color: #94a3b8; }
         .btn-action:hover { transform: scale(1.1); }
+        
         .fab-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4); color: white; font-size: 35px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; transition: 0.3s; }
         .fab-btn:hover { transform: scale(1.1) rotate(90deg); }
+        
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200; }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal-box { background: white; width: 90%; max-width: 600px; padding: 35px; border-radius: 25px; transform: scale(0.9); transition: 0.3s; }
@@ -58,8 +66,10 @@
         .btn-sec { background: #f1f5f9; color: #64748b; }
         .btn-pri { background: var(--primary); color: white; }
         .btn-dan { background: var(--danger); color: white; }
+        
         #toast-msg { visibility: hidden; min-width: 250px; background: #0f172a; color: white; text-align: center; border-radius: 50px; padding: 15px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: 0.3s; }
         #toast-msg.show { visibility: visible; opacity: 1; bottom: 50px; }
+        
         .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.4s; }
         .loading-screen.hidden { opacity: 0; visibility: hidden; }
         .spinner { width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
@@ -117,10 +127,10 @@
 
     <script>
         // ===========================================
-        //  TU NUEVO BIN YA CONFIGURADO
+        //  CONFIGURACIÓN FINAL
         // ===========================================
         const BIN_ID = '6968712543b1c97be93195f1'; 
-        const MASTER_KEY = '$2a$10$rbQNmKHZB95qMFO9kbzxwe3g8vO70vkKhSX7NrbuvZFYShj7duOOi';
+        const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
 
         let db = [];
         let editIdx = -1;
@@ -131,7 +141,7 @@
         const statusEl = document.getElementById('cloudStatus');
         
         async function initApp() {
-            // Failsafe: Si tarda más de 5s, asumimos error de red y desbloqueamos
+            // Failsafe: Si tarda más de 5s, muestra error visual
             const t = setTimeout(() => { 
                 if(db.length===0) {
                     setStatus("⚠️ Sin conexión (Local)", false);
@@ -148,6 +158,7 @@
                 });
                 
                 if(!res.ok) {
+                    if(res.status === 401) throw new Error("API Key Incorrecta (401)");
                     if(res.status === 404) throw new Error("ID Incorrecto (404)");
                     if(res.status === 403) throw new Error("Bin Bloqueado/Público (403)");
                     throw new Error(`Error API (${res.status})`);
@@ -155,7 +166,7 @@
                 
                 const data = await res.json();
                 
-                // Si el bin tiene datos, los cargamos.
+                // Carga de datos
                 if (Array.isArray(data.record)) {
                     db = data.record;
                     setStatus("☁️ Nube Sincronizada", true);
@@ -197,7 +208,7 @@
                 });
                 
                 if(!res.ok) {
-                     if(res.status === 403) throw new Error("Permiso denegado (¿Bin Público?)");
+                     if(res.status === 401) throw new Error("API Key Incorrecta (401)");
                      throw new Error(`Error ${res.status}`);
                 }
                 
@@ -206,7 +217,7 @@
             } catch (e) {
                 console.error(e);
                 setStatus("⚠️ Guardado Local", false);
-                alert(`NO SE PUDO SUBIR: ${e.message}\n\nAsegúrate de que el BIN sea PRIVADO (Candado Cerrado). Se guardó copia local.`);
+                alert(`NO SE PUDO SUBIR: ${e.message}\n\nRevisa tu conexión.`);
             }
             loader.classList.add('hidden');
         }
