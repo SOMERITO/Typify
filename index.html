@@ -178,7 +178,7 @@
     </div>
 
     <div id="results"></div>
-    <div id="toast-msg">¡Copiado con espacios exactos!</div>
+    <div id="toast-msg">¡Guardado Exitosamente!</div>
     <button class="fab-btn" onclick="abrirModal()">+</button>
 
     <div class="overlay" id="modalOverlay">
@@ -211,8 +211,10 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE NUBE (NUEVO ID)
-        const BIN_ID = '69681a15d0ea881f406c588a';
+        // ===========================================
+        // CONFIGURACIÓN NUBE (BIN PRIVADO)
+        // ===========================================
+        const BIN_ID = '69680821ae596e708fdcc510'; // BIN PRIVADO
         const MASTER_KEY = '$2a$10$rbQNmKHZB95qMFO9kbzxwe3g8vO70vkKhSX7NrbuvZFYShj7duOOi';
 
         let db = [];
@@ -224,40 +226,33 @@
         const statusEl = document.getElementById('cloudStatus');
         
         async function initApp() {
-            try {
-                // Fetch con timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 segundos max
+            // Safety: Si no carga en 4s, forzar entrada local
+            const t = setTimeout(() => { 
+                if(db.length===0) setStatus("⚠️ Modo Local (Timeout)",false); 
+                loader.classList.add('hidden'); 
+            }, 4000);
 
+            try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
-                    headers: { 'X-Master-Key': MASTER_KEY },
-                    signal: controller.signal
+                    headers: { 'X-Master-Key': MASTER_KEY, 'X-Bin-Meta': false } 
                 });
                 
                 if(!res.ok) throw new Error("Error API: " + res.status);
                 
                 const data = await res.json();
+                db = Array.isArray(data) ? data : (data.record || []);
                 
-                // --- SEGURIDAD ANTI-CONGELAMIENTO ---
-                // Si el bin está vacío o tiene formato incorrecto, iniciamos como array vacío
-                if (Array.isArray(data.record)) {
-                    db = data.record;
-                } else {
-                    console.warn("Bin vacío o formato incorrecto. Iniciando DB vacía.");
-                    db = [];
-                }
-
+                clearTimeout(t);
                 setStatus("☁️ Nube Sincronizada", true);
             } catch (e) {
-                console.warn(e);
-                setStatus("⚠️ Modo Local (Backup)", false);
+                console.warn("Cargando local por error:", e);
+                setStatus("⚠️ Modo Local", false);
                 db = JSON.parse(localStorage.getItem('misTipificaciones')) || [];
-            } finally {
-                // ESTO SE EJECUTA SIEMPRE, PASE LO QUE PASE
-                renderChips();
-                renderResults();
-                loader.classList.add('hidden');
             }
+            
+            renderChips();
+            renderResults();
+            loader.classList.add('hidden');
         }
 
         function setStatus(text, ok) {
@@ -270,26 +265,29 @@
             localStorage.setItem('misTipificaciones', JSON.stringify(db));
             
             try {
+                // Header importante: X-Bin-Versioning: false
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
                     headers: { 
                         'Content-Type': 'application/json', 
-                        'X-Master-Key': MASTER_KEY 
+                        'X-Master-Key': MASTER_KEY,
+                        'X-Bin-Versioning': 'false' 
                     },
                     body: JSON.stringify(db)
                 });
                 
-                if(!res.ok) throw new Error("Error al guardar");
+                if(!res.ok) throw new Error("Error HTTP: " + res.status);
                 setStatus("☁️ Guardado en Nube", true);
+                mostrarToast("✅ Sincronizado");
             } catch (e) {
                 console.error(e);
-                setStatus("⚠️ Error de Guardado", false);
-                alert("No se pudo guardar en la nube, pero se guardó en este equipo.");
+                setStatus("⚠️ Guardado solo Local", false);
+                alert("Error de conexión. Se guardó localmente.");
             }
             loader.classList.add('hidden');
         }
 
-        // --- PALETA Y UI ---
+        // --- PALETA Y UI ORIGINAL ---
         const paleta = [
             { bg: '#e0e7ff', text: '#4338ca' }, { bg: '#dcfce7', text: '#15803d' }, 
             { bg: '#ffedd5', text: '#c2410c' }, { bg: '#fee2e2', text: '#b91c1c' }, 
@@ -379,7 +377,7 @@
                     return matchText && matchFiltro;
                 });
 
-            if(db.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:40px;">Lista vacía (Añada registros con +).</div>'; return; }
+            if(db.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:40px;">Lista vacía (Usa + para crear).</div>'; return; }
             if(filtered.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;">Sin resultados.</div>'; return; }
 
             filtered.forEach((item, i) => {
@@ -418,11 +416,9 @@
         }
 
         function copiar(idx) {
-            navigator.clipboard.writeText(db[idx].descripcion).then(() => {
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2000);
-            });
+            navigator.clipboard.writeText(db[idx].descripcion).then(() => { mostrarToast("¡Copiado al portapapeles!"); });
         }
+        function mostrarToast(msg) { toast.innerText = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
 
         function abrirModal() {
             editIdx = -1; modalTitle.innerText = "Nueva Tipificación"; btnSave.innerText = "Guardar";
