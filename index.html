@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Ultimate)</title>
+    <title>Typify Pro (Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v41.0 (Smart Search & Clean UI)
+           ESTILOS v42.0 (Z-Index Fix)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -33,7 +33,6 @@
             background-attachment: fixed;
         }
 
-        /* Fondo Decorativo */
         body::before {
             content: ''; position: fixed; top: -100px; left: -100px; width: 500px; height: 500px;
             background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(255,255,255,0) 70%);
@@ -70,23 +69,18 @@
         .status-pill.active .dot { background: #10b981; animation: pulseGlow 2s infinite; }
         .status-pill.error .dot { background: #ef4444; }
 
-        /* --- BUSCADOR FLOTANTE INTELIGENTE --- */
+        /* --- BUSCADOR (CORREGIDO Z-INDEX) --- */
         .search-wrapper { 
             position: relative; 
             width: 100%; 
             max-width: 650px; 
             margin: 0 auto; 
-            z-index: 500; /* Alto para estar sobre las tarjetas */
+            z-index: 100; /* Nivel medio: Encima de las tarjetas, pero debajo del modal */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        /* ESTADO DOCKED (Cuando bajas scroll) */
         .search-wrapper.docked {
-            position: fixed;
-            top: 20px;
-            right: 20px; /* Al lado derecho */
-            width: 300px; /* Más pequeño */
-            margin: 0;
+            position: fixed; top: 20px; right: 20px; width: 300px; margin: 0;
             transform-origin: top right;
         }
         
@@ -100,12 +94,9 @@
             transition: all 0.3s ease;
         }
         
-        /* Ajuste visual cuando está docked */
         .search-wrapper.docked .search-input {
-            padding: 12px 40px 12px 45px;
-            font-size: 0.95rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.8);
+            padding: 12px 40px 12px 45px; font-size: 0.95rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.8);
         }
 
         .search-input:focus { transform: translateY(-2px); box-shadow: 0 20px 40px -5px rgba(99, 102, 241, 0.15); outline: none; }
@@ -114,7 +105,6 @@
             position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
             color: #94a3b8; pointer-events: none; transition: 0.3s; 
         }
-        /* Ajuste icono en docked */
         .search-wrapper.docked .search-icon { left: 15px; width: 18px; height: 18px; }
 
         .search-input:focus + .search-icon { color: var(--primary); }
@@ -126,7 +116,7 @@
             opacity: 0; visibility: hidden; transition: 0.2s;
         }
         .btn-clear.visible { opacity: 1; visibility: visible; transform: translateY(-50%) scale(1); }
-        .search-wrapper.docked .btn-clear { right: 10px; width: 24px; height: 24px; } /* Ajuste clear en docked */
+        .search-wrapper.docked .btn-clear { right: 10px; width: 24px; height: 24px; }
         .btn-clear:hover { background: #fee2e2; color: #ef4444; }
 
         /* CHIPS */
@@ -148,8 +138,9 @@
             box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.6);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0; animation: slideUp 0.5s forwards;
+            z-index: 10;
         }
-        .card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-hover); }
+        .card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-hover); z-index: 20; }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .badge { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
@@ -178,19 +169,26 @@
         }
         .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
 
-        /* RUTA LIMPIA (SIN ICONO INICIAL) */
         .route { 
             font-family: 'Courier New', monospace; font-size: 0.85rem; color: #94a3b8; 
             font-weight: 600; padding-left: 5px;
         }
 
-        .fab { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 15px 30px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.4s; z-index: 100; }
+        .fab { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 15px 30px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.4s; z-index: 90; }
         .fab:hover { transform: scale(1.1) rotate(90deg); background: var(--primary); }
 
-        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(50px); background: #1e293b; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 1000; display: flex; align-items: center; gap: 10px; }
+        /* --- TOAST --- */
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(50px); background: #1e293b; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2500; display: flex; align-items: center; gap: 10px; }
         #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200; }
+        /* --- MODAL (CAPA SUPERIOR - Nivel 2000) --- */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); 
+            display: flex; justify-content: center; align-items: center; 
+            opacity: 0; visibility: hidden; transition: 0.3s; 
+            z-index: 2000; /* ESTO ARREGLA EL BUG */
+        }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 30px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.3s; }
         .overlay.active .modal { transform: scale(1); }
@@ -208,7 +206,7 @@
         .btn-delete { background: #fee2e2; color: #ef4444; }
         .btn-delete:hover { background: #ef4444; color: white; }
 
-        .loader { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
+        .loader { position: fixed; inset: 0; background: white; z-index: 3000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
         .loader.hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -304,7 +302,7 @@
             loader: document.getElementById('loader'),
             status: document.getElementById('statusEl'),
             statusTxt: document.getElementById('statusTxt'),
-            searchWrap: document.getElementById('searchWrapper'), // Wrapper para efecto Dock
+            searchWrap: document.getElementById('searchWrapper'),
             search: document.getElementById('searchIn'),
             clear: document.getElementById('clearBtn'),
             chips: document.getElementById('chips'),
@@ -319,13 +317,9 @@
 
         window.onload = () => { el.search.focus(); init(); };
 
-        // --- DETECCIÓN DE SCROLL PARA BUSCADOR FLOTANTE ---
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 150) {
-                el.searchWrap.classList.add('docked');
-            } else {
-                el.searchWrap.classList.remove('docked');
-            }
+            if (window.scrollY > 150) el.searchWrap.classList.add('docked');
+            else el.searchWrap.classList.remove('docked');
         });
 
         async function init() {
@@ -359,9 +353,8 @@
         function getColor(s) { if(!s) return colors[0]; let h=0; for(let i=0;i<s.length;i++)h+=s.charCodeAt(i); return colors[h%colors.length]; }
 
         function render() {
-            // ORDENAR CHIPS: TODOS PRIMERO
             const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
-            const cats = ["TODOS", ...uniqueCats]; // Forzamos TODOS al inicio
+            const cats = ["TODOS", ...uniqueCats];
             
             el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
 
@@ -372,7 +365,6 @@
 
             el.res.innerHTML = list.map(x => {
                 const c = getColor(x.clasificacion);
-                // RUTA: Sin icono inicial, solo texto
                 const rutaHTML = x.ruta ? `<div class="route">${x.ruta}</div>` : '';
                 
                 return `
