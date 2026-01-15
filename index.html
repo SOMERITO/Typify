@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typify Pro (Cloud Edition)</title>
     <style>
-        /* ESTILOS (Diseño Original v19 - Restaurado) */
+        /* ESTILOS (Versión 38 - Click to Copy) */
         :root { --primary: #4f46e5; --secondary: #ec4899; --bg: #f8fafc; --text: #0f172a; --card-bg: #ffffff; --danger: #ef4444; --success: #10b981; }
         body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .header-final { width: 100%; max-width: 800px; text-align: center; margin-bottom: 40px; animation: fadeIn 0.6s ease; }
         h1 { margin: 0 0 10px 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; font-weight: 800; }
@@ -40,11 +39,42 @@
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
         .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 5px 12px; border-radius: 8px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
         .titulo { font-size: 1.3rem; font-weight: 700; color: #0f172a; }
-        .desc-box { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px; display: flex; align-items: stretch; overflow: hidden; margin-bottom: 15px; transition: 0.2s; }
-        .desc-box:hover { border-color: var(--primary); background: white; }
-        .desc-text { flex: 1; padding: 15px; font-size: 1rem; color: #334155; line-height: 1.6; white-space: pre-wrap; margin: 0; }
-        .btn-copy { background: white; border: none; border-left: 1px solid #cbd5e1; width: 60px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.2s; }
-        .btn-copy:hover { background: #e0e7ff; }
+        
+        /* --- NUEVO ESTILO DESC-BOX CLICKABLE --- */
+        .desc-box { 
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 12px; 
+            padding: 15px; margin-bottom: 15px; transition: 0.2s; 
+            cursor: pointer; /* Manito */
+            position: relative;
+        }
+        .desc-box:hover { 
+            border-color: var(--primary); 
+            background: #eef2ff; /* Fondo azulito suave */
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+        .desc-box:active { transform: scale(0.98); } /* Efecto click */
+        
+        /* Etiqueta flotante "Copiar" al pasar el mouse */
+        .desc-box::after {
+            content: "📋 Click para copiar";
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: 0.2s;
+            pointer-events: none;
+        }
+        .desc-box:hover::after { opacity: 1; transform: translateY(0); }
+
+        .desc-text { font-size: 1rem; color: #334155; line-height: 1.6; white-space: pre-wrap; margin: 0; font-family: inherit; }
+        
         .ruta { font-family: monospace; font-size: 0.9rem; color: #64748b; font-weight: 600; }
         .actions { display: flex; gap: 8px; opacity: 0; transition: 0.3s; }
         .card-final:hover .actions { opacity: 1; }
@@ -127,7 +157,7 @@
 
     <script>
         // ===========================================
-        //  TUS LLAVES DE ACCESO (YA CONFIGURADAS)
+        //  CONFIGURACIÓN ACTUAL (v38.0)
         // ===========================================
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
@@ -141,7 +171,6 @@
         const statusEl = document.getElementById('cloudStatus');
         
         async function initApp() {
-            // Failsafe: Si tarda más de 5s, muestra error visual
             const t = setTimeout(() => { 
                 if(db.length===0) {
                     setStatus("⚠️ Sin conexión (Local)", false);
@@ -152,21 +181,14 @@
             }, 5000);
 
             try {
-                // LEER DE LA NUBE
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
                     headers: { 'X-Master-Key': MASTER_KEY } 
                 });
                 
-                if(!res.ok) {
-                    if(res.status === 401) throw new Error("API Key Incorrecta (401)");
-                    if(res.status === 404) throw new Error("ID Incorrecto (404)");
-                    if(res.status === 403) throw new Error("Bin Bloqueado/Público (403)");
-                    throw new Error(`Error API (${res.status})`);
-                }
+                if(!res.ok) throw new Error(`Error API (${res.status})`);
                 
                 const data = await res.json();
                 
-                // Carga de datos
                 if (Array.isArray(data.record)) {
                     db = data.record;
                     setStatus("☁️ Nube Sincronizada", true);
@@ -197,21 +219,13 @@
             localStorage.setItem('misTipificaciones', JSON.stringify(db));
             
             try {
-                // GUARDAR EN LA NUBE
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-Master-Key': MASTER_KEY 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
                     body: JSON.stringify(db)
                 });
                 
-                if(!res.ok) {
-                     if(res.status === 401) throw new Error("API Key Incorrecta (401)");
-                     throw new Error(`Error ${res.status}`);
-                }
-                
+                if(!res.ok) throw new Error(`Error ${res.status}`);
                 setStatus("☁️ Guardado OK", true);
                 mostrarToast("✅ Datos guardados en nube");
             } catch (e) {
@@ -229,22 +243,16 @@
         window.onload = () => { inputBusqueda.focus(); initApp(); };
         inputBusqueda.addEventListener('input', () => { btnLimpiar.classList.toggle('visible', inputBusqueda.value.length>0); renderResults(inputBusqueda.value); });
         
-        // --- ATAJOS DE TECLADO MEJORADOS ---
+        // ATAJOS DE TECLADO
         document.addEventListener('keydown', (e) => {
-            // CTRL + F: Ir al buscador
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
-                e.preventDefault(); // Evita el buscador del navegador
-                inputBusqueda.focus();
-                inputBusqueda.select();
+                e.preventDefault(); inputBusqueda.focus(); inputBusqueda.select();
             }
-            // ESC: Limpiar todo
             if (e.key === 'Escape') {
-                e.preventDefault();
-                limpiar();
+                e.preventDefault(); limpiar();
             }
         });
 
-        // Función Limpiar (Botón X y ESC)
         function limpiar() {
             inputBusqueda.value = '';
             btnLimpiar.classList.remove('visible');
@@ -269,11 +277,28 @@
             if(!f.length){ resultsDiv.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:20px;">Sin resultados</div>'; return; }
             f.forEach(x => {
                 const c=getColor(x.clasificacion); const d=document.createElement('div'); d.className='card-final';
-                d.innerHTML=`<div class="card-bar" style="background:${c.text}"></div><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.text}">${x.clasificacion}</span>`:''}<div class="titulo">${x.titulo}</div></div><div class="actions"><button class="btn-action" onclick="editar(${x.idx})">✏️</button><button class="btn-action" onclick="preDelete(${x.idx})">🗑️</button></div></div><div class="desc-box" onclick="copiar(${x.idx})"><pre class="desc-text">${x.descripcion}</pre></div><div class="ruta">${x.ruta||''}</div>`;
+                // La diferencia está aquí: el desc-box ahora es interactivo
+                d.innerHTML=`<div class="card-bar" style="background:${c.text}"></div>
+                <div class="card-header">
+                    <div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.text}">${x.clasificacion}</span>`:''}<div class="titulo">${x.titulo}</div></div>
+                    <div class="actions">
+                        <button class="btn-action" onclick="editar(${x.idx})">✏️</button>
+                        <button class="btn-action" onclick="preDelete(${x.idx})">🗑️</button>
+                    </div>
+                </div>
+                <div class="desc-box" onclick="copiar(${x.idx})" title="Click para copiar">
+                    <pre class="desc-text">${x.descripcion}</pre>
+                </div>
+                <div class="ruta">${x.ruta||''}</div>`;
                 resultsDiv.appendChild(d);
             });
         }
-        function copiar(i){ navigator.clipboard.writeText(db[i].descripcion); mostrarToast("Copiado"); }
+        
+        function copiar(i){ 
+            navigator.clipboard.writeText(db[i].descripcion); 
+            mostrarToast("¡Copiado al portapapeles!"); 
+        }
+        
         function mostrarToast(m){ toast.innerText=m; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2000); }
         function abrirModal(){ editIdx=-1; document.getElementById('inClass').value=document.getElementById('inTitle').value=document.getElementById('inDesc').value=document.getElementById('inRoute').value=""; modalOverlay.classList.add('active'); }
         function editar(i){ editIdx=i; const x=db[i]; document.getElementById('inClass').value=x.clasificacion||""; document.getElementById('inTitle').value=x.titulo; document.getElementById('inDesc').value=x.descripcion; document.getElementById('inRoute').value=x.ruta||""; modalOverlay.classList.add('active'); }
