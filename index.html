@@ -3,314 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Cloud Edition)</title>
+    <title>Typify Pro (Enterprise Edition)</title>
     <style>
-        /* ESTILOS (Versión 38 - Click to Copy) */
-        :root { --primary: #4f46e5; --secondary: #ec4899; --bg: #f8fafc; --text: #0f172a; --card-bg: #ffffff; --danger: #ef4444; --success: #10b981; }
-        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .header-final { width: 100%; max-width: 800px; text-align: center; margin-bottom: 40px; animation: fadeIn 0.6s ease; }
-        h1 { margin: 0 0 10px 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; font-weight: 800; }
-        
-        .cloud-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 5px 15px; border-radius: 20px; background: #e2e8f0; color: #64748b; margin-bottom: 25px; transition: 0.3s; }
-        .cloud-status.active { background: #dcfce7; color: var(--success); }
-        .cloud-status.error { background: #fee2e2; color: var(--danger); }
-        
-        .contenedor-buscador-flex { display: flex; align-items: center; justify-content: center; width: 100%; gap: 20px; position: relative; }
-        .input-wrapper-final { flex: 1; max-width: 700px; position: relative; }
-        .icono-lupa { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 22px; height: 22px; pointer-events: none; }
-        .input-busqueda-final { width: 100%; padding: 18px 25px 18px 55px; font-size: 1.2rem; border: 2px solid transparent; border-radius: 20px; background: white; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); outline: none; transition: 0.3s; color: var(--text); box-sizing: border-box; }
-        .input-busqueda-final:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
-        
-        .btn-borrar-final { width: 55px; height: 55px; flex-shrink: 0; background: white; border: 2px solid #ef4444; border-radius: 18px; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transform: scale(0); transition: 0.3s; }
-        .btn-borrar-final.visible { visibility: visible; opacity: 1; transform: scale(1); }
-        .btn-borrar-final:hover { background: #ef4444; color: white; transform: rotate(90deg); }
-        
-        .chips-wrapper { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 25px; }
-        .chip-final { background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: 0.2s; }
-        .chip-final.active { transform: scale(1.05); color: white !important; border-color: transparent !important; }
-        
-        #results { width: 100%; max-width: 800px; display: grid; gap: 20px; padding-bottom: 100px; }
-        .card-final { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid white; transition: 0.3s; opacity: 0; animation: fadeIn 0.5s forwards; position: relative; overflow: hidden; }
-        .card-final:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.1); }
-        .card-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; opacity: 0; transition: 0.3s; }
-        .card-final:hover .card-bar { opacity: 1; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
-        .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 5px 12px; border-radius: 8px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .titulo { font-size: 1.3rem; font-weight: 700; color: #0f172a; }
-        
-        /* --- NUEVO ESTILO DESC-BOX CLICKABLE --- */
-        .desc-box { 
-            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 12px; 
-            padding: 15px; margin-bottom: 15px; transition: 0.2s; 
-            cursor: pointer; /* Manito */
-            position: relative;
+        /* =========================================
+           ESTILOS ENTERPRISE (v39.0 - No Emojis)
+           ========================================= */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --card-bg: #ffffff;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: #e2e8f0;
         }
-        .desc-box:hover { 
-            border-color: var(--primary); 
-            background: #eef2ff; /* Fondo azulito suave */
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-        .desc-box:active { transform: scale(0.98); } /* Efecto click */
-        
-        /* Etiqueta flotante "Copiar" al pasar el mouse */
-        .desc-box::after {
-            content: "📋 Click para copiar";
-            position: absolute;
-            top: -10px;
-            right: 15px;
-            background: var(--primary);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 12px;
-            opacity: 0;
-            transform: translateY(5px);
-            transition: 0.2s;
-            pointer-events: none;
-        }
-        .desc-box:hover::after { opacity: 1; transform: translateY(0); }
 
-        .desc-text { font-size: 1rem; color: #334155; line-height: 1.6; white-space: pre-wrap; margin: 0; font-family: inherit; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- ANIMACIONES --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes clickPulse { 0% { border-color: var(--primary); } 50% { border-color: var(--success); background: #f0fdf4; } 100% { border-color: #cbd5e1; background: #f1f5f9; } }
+
+        /* --- HEADER --- */
+        .header-final { width: 100%; max-width: 800px; text-align: center; margin-bottom: 40px; animation: fadeIn 0.6s ease; }
         
-        .ruta { font-family: monospace; font-size: 0.9rem; color: #64748b; font-weight: 600; }
-        .actions { display: flex; gap: 8px; opacity: 0; transition: 0.3s; }
-        .card-final:hover .actions { opacity: 1; }
-        .btn-action { background: #f1f5f9; border: none; padding: 8px; border-radius: 8px; cursor: pointer; color: #94a3b8; }
-        .btn-action:hover { transform: scale(1.1); }
+        h1 { 
+            margin: 0 0 15px 0; 
+            font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+
+        /* --- STATUS INDICATOR (Punto de luz) --- */
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.8rem; font-weight: 600; color: var(--text-light);
+            background: white; padding: 6px 14px; border-radius: 50px;
+            border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 30px; transition: all 0.3s ease;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+        .status-pill.active .status-dot { background: var(--success); animation: pulse 2s infinite; }
+        .status-pill.error .status-dot { background: var(--danger); }
+        .status-pill.error { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+
+        /* --- BUSCADOR --- */
+        .search-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; display: flex; align-items: center; }
         
-        .fab-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4); color: white; font-size: 35px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; transition: 0.3s; }
-        .fab-btn:hover { transform: scale(1.1) rotate(90deg); }
+        .search-icon { position: absolute; left: 16px; color: #94a3b8; width: 20px; height: 20px; pointer-events: none; transition: 0.3s; }
         
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200; }
+        .search-input {
+            width: 100%; padding: 16px 45px 16px 48px; font-size: 1.1rem;
+            border: 1px solid var(--border); border-radius: 16px;
+            background: white; color: var(--text);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .search-input:focus + .search-icon { color: var(--primary); }
+
+        .btn-clear {
+            position: absolute; right: 12px;
+            background: none; border: none; cursor: pointer;
+            color: #94a3b8; display: flex; align-items: center;
+            padding: 4px; border-radius: 50%; transition: 0.2s;
+            opacity: 0; visibility: hidden; transform: scale(0.8);
+        }
+        .btn-clear.visible { opacity: 1; visibility: visible; transform: scale(1); }
+        .btn-clear:hover { background: #f1f5f9; color: var(--danger); }
+
+        /* --- CHIPS --- */
+        .chips-area { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 25px; }
+        .chip {
+            background: white; border: 1px solid var(--border); color: var(--text-light);
+            padding: 6px 16px; border-radius: 50px; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+        }
+        .chip:hover { border-color: #cbd5e1; transform: translateY(-1px); }
+        .chip.active { background: var(--text); color: white; border-color: var(--text); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+        /* --- TARJETAS --- */
+        #results { width: 100%; max-width: 800px; display: grid; gap: 16px; padding-bottom: 100px; }
+        
+        .card {
+            background: white; padding: 24px; border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden;
+            animation: fadeIn 0.4s ease forwards; opacity: 0;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -6px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .card-meta { display: flex; flex-direction: column; gap: 4px; }
+        .badge { 
+            display: inline-flex; align-items: center; font-size: 0.7rem; font-weight: 700; 
+            padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .card-title { font-size: 1.15rem; font-weight: 700; color: #1e293b; line-height: 1.3; }
+
+        .card-actions { display: flex; gap: 4px; opacity: 0; transform: translateX(10px); transition: 0.3s; }
+        .card:hover .card-actions { opacity: 1; transform: translateX(0); }
+        
+        .icon-btn {
+            background: transparent; border: none; padding: 8px; border-radius: 8px;
+            color: #94a3b8; cursor: pointer; transition: 0.2s; display: flex;
+        }
+        .icon-btn:hover { background: #f1f5f9; color: var(--primary); }
+        .icon-btn.delete:hover { color: var(--danger); background: #fef2f2; }
+
+        /* --- DESCRIPCIÓN COPY --- */
+        .desc-box {
+            background: #f8fafc; border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; position: relative; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .desc-box:hover { border-color: var(--primary); background: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.05); }
+        .desc-box.copied { animation: clickPulse 0.4s ease; }
+        
+        .desc-text { 
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #334155; 
+            line-height: 1.6; white-space: pre-wrap; margin: 0; pointer-events: none; 
+        }
+        
+        /* Tooltip SVG */
+        .copy-hint {
+            position: absolute; top: 12px; right: 12px; 
+            display: flex; align-items: center; gap: 4px;
+            font-size: 0.75rem; font-weight: 600; color: var(--primary);
+            opacity: 0; transform: translateY(5px); transition: 0.2s;
+            background: white; padding: 4px 8px; border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid #e0e7ff;
+        }
+        .desc-box:hover .copy-hint { opacity: 1; transform: translateY(0); }
+
+        .route-text { font-family: 'Courier New', monospace; font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+
+        /* --- FAB & MODALS --- */
+        .fab {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--text); color: white; border-radius: 50%;
+            border: none; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100;
+        }
+        .fab:hover { transform: scale(1.1); background: black; }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200;
+        }
         .overlay.active { opacity: 1; visibility: visible; }
-        .modal-box { background: white; width: 90%; max-width: 600px; padding: 35px; border-radius: 25px; transform: scale(0.9); transition: 0.3s; }
-        .overlay.active .modal-box { transform: scale(1); }
-        .form-row { margin-bottom: 20px; }
-        .form-row label { display: block; margin-bottom: 8px; font-weight: 700; color: #475569; }
-        .form-row input, .form-row textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; box-sizing: border-box; background: #f8fafc; }
-        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-main { padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 1rem; }
-        .btn-sec { background: #f1f5f9; color: #64748b; }
-        .btn-pri { background: var(--primary); color: white; }
-        .btn-dan { background: var(--danger); color: white; }
         
-        #toast-msg { visibility: hidden; min-width: 250px; background: #0f172a; color: white; text-align: center; border-radius: 50px; padding: 15px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: 0.3s; }
-        #toast-msg.show { visibility: visible; opacity: 1; bottom: 50px; }
-        
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.4s; }
-        .loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .modal {
+            background: white; width: 90%; max-width: 550px; padding: 32px;
+            border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: scale(0.95); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .overlay.active .modal { transform: scale(1); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #475569; }
+        .form-input { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+            font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; font-family: inherit;
+        }
+        .form-input:focus { border-color: var(--primary); background: white; outline: none; }
+
+        .btn-row { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: 0.95rem; transition: 0.2s; }
+        .btn-ghost { background: transparent; color: #64748b; }
+        .btn-ghost:hover { background: #f1f5f9; color: var(--text); }
+        .btn-primary { background: var(--text); color: white; }
+        .btn-primary:hover { background: black; transform: translateY(-1px); }
+        .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-danger:hover { background: #fecaca; }
+
+        /* --- TOAST --- */
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px;
+            font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
+        }
+        #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        /* --- LOADER --- */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white;
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s;
+        }
+        .loader-overlay.hidden { opacity: 0; pointer-events: none; }
+        .spinner-svg { width: 40px; height: 40px; animation: spin 0.8s linear infinite; color: var(--primary); }
+
     </style>
 </head>
 <body>
 
-    <div id="loader" class="loading-screen">
-        <div class="spinner"></div>
-        <h3 style="color:#64748b;">Conectando con la nube...</h3>
+    <div id="loader" class="loader-overlay">
+        <svg class="spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+        </svg>
     </div>
 
     <div class="header-final">
-        <h1>Gestor de Tipificaciones</h1>
-        <div id="cloudStatus" class="cloud-status">Conectando...</div>
-        <div class="contenedor-buscador-flex">
-            <div class="input-wrapper-final">
-                <svg class="icono-lupa" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="inputBusqueda" class="input-busqueda-final" placeholder="Escribe para filtrar..." autocomplete="off">
-            </div>
-            <button id="btnLimpiar" class="btn-borrar-final">✕</button>
+        <h1>Typify Pro</h1>
+        
+        <div id="statusEl" class="status-pill">
+            <div class="status-dot"></div>
+            <span id="statusText">Conectando...</span>
         </div>
-        <div id="chipsArea" class="chips-wrapper"></div>
+
+        <div class="search-container">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar tipificación (Ctrl + F)" autocomplete="off">
+            <button id="clearBtn" class="btn-clear">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <div id="chipsArea" class="chips-area"></div>
     </div>
 
     <div id="results"></div>
-    <div id="toast-msg">¡Acción completada!</div>
-    <button class="fab-btn" onclick="abrirModal()">+</button>
 
-    <div class="overlay" id="modalOverlay">
-        <div class="modal-box">
-            <h2 id="modalTitle" style="margin-top:0; color:var(--primary); text-align:center;">Nueva Tipificación</h2>
-            <div style="display:flex; gap:15px;">
-                <div class="form-row" style="flex:1"><label>Clasificación</label><input id="inClass" placeholder="Ej: PASOS"></div>
-                <div class="form-row" style="flex:2"><label>Título</label><input id="inTitle" placeholder="Ej: Retiro de Ciclo"></div>
+    <div id="toast">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span id="toastText">Copiado</span>
+    </div>
+
+    <button class="fab" onclick="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+
+    <div class="overlay" id="mainModal">
+        <div class="modal">
+            <h2 id="modalTitle" style="margin:0 0 24px 0; color:#1e293b;">Nueva Tipificación</h2>
+            <div style="display:flex; gap:16px;">
+                <div class="form-group" style="flex:1">
+                    <label class="form-label">Clasificación</label>
+                    <input id="inClass" class="form-input" placeholder="Ej: PASOS">
+                </div>
+                <div class="form-group" style="flex:2">
+                    <label class="form-label">Título</label>
+                    <input id="inTitle" class="form-input" placeholder="Ej: Retiro de Ciclo">
+                </div>
             </div>
-            <div class="form-row"><label>Descripción</label><textarea id="inDesc" rows="6"></textarea></div>
-            <div class="form-row"><label>Ruta</label><input id="inRoute"></div>
-            <div class="modal-btns">
-                <button class="btn-main btn-sec" onclick="cerrarModal()">Cancelar</button>
-                <button class="btn-main btn-pri" id="btnSave" onclick="guardar()">Guardar</button>
+            <div class="form-group">
+                <label class="form-label">Descripción (Script)</label>
+                <textarea id="inDesc" class="form-input" rows="6" placeholder="Texto que se copiará..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ruta / Sistema</label>
+                <input id="inRoute" class="form-input" placeholder="Ej: CRM > Trámites">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" id="btnSave" onclick="saveData()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <div class="overlay" id="deleteOverlay">
-        <div class="modal-box" style="text-align:center;">
-            <h3>¿Eliminar registro?</h3>
-            <div class="modal-btns" style="justify-content:center;">
-                <button class="btn-main btn-sec" onclick="cerrarDelete()">Cancelar</button>
-                <button class="btn-main btn-dan" onclick="confirmDelete()">Eliminar</button>
+    <div class="overlay" id="deleteModal">
+        <div class="modal" style="max-width:400px; text-align:center;">
+            <div style="width:60px; height:60px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#ef4444;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+            </div>
+            <h3 style="margin:0 0 8px 0;">¿Eliminar registro?</h3>
+            <p style="color:#64748b; margin:0 0 24px 0;">Esta acción no se puede deshacer.</p>
+            <div class="btn-row" style="justify-content:center;">
+                <button class="btn btn-ghost" onclick="closeDelete()">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Eliminar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ===========================================
-        //  CONFIGURACIÓN ACTUAL (v38.0)
-        // ===========================================
+        // --- CONFIGURACIÓN (NO TOCAR) ---
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
 
+        // --- ESTADO APP ---
         let db = [];
         let editIdx = -1;
         let filtro = "TODOS";
         let deleteIdx = null;
 
-        const loader = document.getElementById('loader');
-        const statusEl = document.getElementById('cloudStatus');
-        
-        async function initApp() {
+        // --- ELEMENTOS DOM ---
+        const els = {
+            loader: document.getElementById('loader'),
+            status: document.getElementById('statusEl'),
+            statusTxt: document.getElementById('statusText'),
+            search: document.getElementById('searchInput'),
+            clearBtn: document.getElementById('clearBtn'),
+            chips: document.getElementById('chipsArea'),
+            results: document.getElementById('results'),
+            toast: document.getElementById('toast'),
+            toastTxt: document.getElementById('toastText'),
+            mainModal: document.getElementById('mainModal'),
+            delModal: document.getElementById('deleteModal'),
+            inputs: {
+                class: document.getElementById('inClass'),
+                title: document.getElementById('inTitle'),
+                desc: document.getElementById('inDesc'),
+                route: document.getElementById('inRoute')
+            },
+            modalTitle: document.getElementById('modalTitle'),
+            btnSave: document.getElementById('btnSave')
+        };
+
+        // --- INICIO ---
+        window.onload = () => { els.search.focus(); init(); };
+
+        async function init() {
+            // Failsafe local
             const t = setTimeout(() => { 
-                if(db.length===0) {
-                    setStatus("⚠️ Sin conexión (Local)", false);
-                    db = JSON.parse(localStorage.getItem('misTipificaciones')) || [];
-                    loader.classList.add('hidden');
-                    renderResults();
-                }
+                if(db.length===0) { updateStatus(false, "Modo Local"); loadLocal(); hideLoader(); }
             }, 5000);
 
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
-                    headers: { 'X-Master-Key': MASTER_KEY } 
-                });
-                
-                if(!res.ok) throw new Error(`Error API (${res.status})`);
-                
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: {'X-Master-Key': MASTER_KEY} });
+                if(!res.ok) throw new Error(res.status);
                 const data = await res.json();
                 
-                if (Array.isArray(data.record)) {
-                    db = data.record;
-                    setStatus("☁️ Nube Sincronizada", true);
-                } else {
-                    db = [];
-                    setStatus("✨ Base de Datos Nueva", true);
-                }
-                
+                db = Array.isArray(data.record) ? data.record : [];
+                updateStatus(true, "En línea");
                 clearTimeout(t);
             } catch (e) {
                 console.warn(e);
-                setStatus(`⚠️ Error: ${e.message}`, false);
-                db = JSON.parse(localStorage.getItem('misTipificaciones')) || [];
+                updateStatus(false, "Desconectado");
+                loadLocal();
             }
-            
-            renderChips();
-            renderResults();
-            loader.classList.add('hidden');
+            render();
+            hideLoader();
         }
 
-        function setStatus(text, ok) {
-            statusEl.innerText = text;
-            statusEl.className = `cloud-status ${ok ? 'active' : 'error'}`;
+        // --- LÓGICA CORE ---
+        function updateStatus(online, text) {
+            els.status.className = `status-pill ${online ? 'active' : 'error'}`;
+            els.statusTxt.innerText = text;
         }
 
-        async function syncCloud() {
-            loader.classList.remove('hidden');
-            localStorage.setItem('misTipificaciones', JSON.stringify(db));
-            
+        function loadLocal() { db = JSON.parse(localStorage.getItem('typify_db')) || []; }
+        function hideLoader() { els.loader.classList.add('hidden'); }
+
+        async function sync() {
+            els.loader.classList.remove('hidden');
+            localStorage.setItem('typify_db', JSON.stringify(db));
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                
-                if(!res.ok) throw new Error(`Error ${res.status}`);
-                setStatus("☁️ Guardado OK", true);
-                mostrarToast("✅ Datos guardados en nube");
+                if(!res.ok) throw new Error();
+                updateStatus(true, "Guardado");
+                showToast("Cambios guardados");
             } catch (e) {
-                console.error(e);
-                setStatus("⚠️ Guardado Local", false);
-                alert(`NO SE PUDO SUBIR: ${e.message}\n\nRevisa tu conexión.`);
+                updateStatus(false, "Error al guardar");
+                alert("No se pudo sincronizar con la nube. Se guardó localmente.");
             }
-            loader.classList.add('hidden');
+            hideLoader();
         }
 
-        const paleta = [{bg:'#e0e7ff',text:'#4338ca'},{bg:'#dcfce7',text:'#15803d'},{bg:'#ffedd5',text:'#c2410c'},{bg:'#fee2e2',text:'#b91c1c'},{bg:'#fae8ff',text:'#a21caf'},{bg:'#ccfbf1',text:'#0f766e'},{bg:'#fef9c3',text:'#a16207'},{bg:'#f3e8ff',text:'#7e22ce'},{bg:'#e0f2fe',text:'#0369a1'},{bg:'#ffe4e6',text:'#be123c'},{bg:'#f1f5f9',text:'#475569'}];
-        function getColor(t){ if(!t)return paleta[10]; let s=0; for(let i=0;i<t.length;i++)s+=t.charCodeAt(i); return paleta[s%paleta.length]; }
-        const inputBusqueda = document.getElementById('inputBusqueda'); const btnLimpiar = document.getElementById('btnLimpiar'); const resultsDiv = document.getElementById('results'); const chipsDiv = document.getElementById('chipsArea'); const toast = document.getElementById('toast-msg'); const modalOverlay = document.getElementById('modalOverlay'); const deleteOverlay = document.getElementById('deleteOverlay');
-        
-        window.onload = () => { inputBusqueda.focus(); initApp(); };
-        inputBusqueda.addEventListener('input', () => { btnLimpiar.classList.toggle('visible', inputBusqueda.value.length>0); renderResults(inputBusqueda.value); });
-        
-        // ATAJOS DE TECLADO
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
-                e.preventDefault(); inputBusqueda.focus(); inputBusqueda.select();
-            }
-            if (e.key === 'Escape') {
-                e.preventDefault(); limpiar();
-            }
-        });
-
-        function limpiar() {
-            inputBusqueda.value = '';
-            btnLimpiar.classList.remove('visible');
-            inputBusqueda.focus();
-            renderResults("");
+        // --- RENDERIZADO ---
+        const colors = [
+            {bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'},
+            {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'},
+            {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}
+        ];
+        function getColor(str) { 
+            if(!str) return colors[0];
+            let hash = 0; for(let i=0; i<str.length; i++) hash += str.charCodeAt(i);
+            return colors[hash % colors.length];
         }
-        btnLimpiar.addEventListener('click', limpiar);
+
+        function render() {
+            renderChips();
+            renderResults(els.search.value);
+        }
 
         function renderChips() {
-            const cats = ["TODOS", ...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
-            chipsDiv.innerHTML = '';
-            cats.forEach(c => {
-                const b = document.createElement('button'); b.className = `chip-final ${filtro===c?'active':''}`; b.innerText = c==="TODOS"?"Todos":c;
-                if(c!=="TODOS"){ const col=getColor(c); b.style.color=col.text; b.style.borderColor=col.bg; if(filtro===c){b.style.backgroundColor=col.text;b.style.color='white';} }
-                else if(filtro==="TODOS"){ b.style.background='#4f46e5'; b.style.color='white'; }
-                b.onclick=()=>{filtro=c;renderChips();renderResults(inputBusqueda.value);}; chipsDiv.appendChild(b);
-            });
+            const cats = ["TODOS", ...new Set(db.map(x => x.clasificacion).filter(Boolean))].sort();
+            els.chips.innerHTML = cats.map(c => `
+                <button class="chip ${filtro===c ? 'active' : ''}" onclick="setFilter('${c}')">
+                    ${c === "TODOS" ? "Todos" : c}
+                </button>
+            `).join('');
         }
-        function renderResults(t=""){
-            resultsDiv.innerHTML = ""; const txt=t.toLowerCase();
-            const f = db.map((x,i)=>({...x, idx:i})).filter(x => (x.titulo.toLowerCase().includes(txt)||x.descripcion.toLowerCase().includes(txt)) && (filtro==="TODOS"||x.clasificacion===filtro));
-            if(!f.length){ resultsDiv.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:20px;">Sin resultados</div>'; return; }
-            f.forEach(x => {
-                const c=getColor(x.clasificacion); const d=document.createElement('div'); d.className='card-final';
-                // La diferencia está aquí: el desc-box ahora es interactivo
-                d.innerHTML=`<div class="card-bar" style="background:${c.text}"></div>
-                <div class="card-header">
-                    <div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.text}">${x.clasificacion}</span>`:''}<div class="titulo">${x.titulo}</div></div>
-                    <div class="actions">
-                        <button class="btn-action" onclick="editar(${x.idx})">✏️</button>
-                        <button class="btn-action" onclick="preDelete(${x.idx})">🗑️</button>
+        window.setFilter = (c) => { filtro = c; render(); };
+
+        function renderResults(query = "") {
+            const q = query.toLowerCase();
+            const list = db.map((item, i) => ({...item, idx: i}))
+                .filter(x => (filtro==="TODOS" || x.clasificacion===filtro) && 
+                             (x.titulo.toLowerCase().includes(q) || x.descripcion.toLowerCase().includes(q)));
+
+            if(list.length === 0) {
+                els.results.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:40px;">No se encontraron resultados</div>`;
+                return;
+            }
+
+            els.results.innerHTML = list.map((item, i) => {
+                const c = getColor(item.clasificacion);
+                return `
+                <div class="card" style="animation-delay:${i*0.05}s">
+                    <div class="card-header">
+                        <div class="card-meta">
+                            ${item.clasificacion ? `<span class="badge" style="background:${c.bg}; color:${c.t}">${item.clasificacion}</span>` : ''}
+                            <div class="card-title">${item.titulo}</div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn" onclick="openModal(${item.idx})">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="icon-btn delete" onclick="askDelete(${item.idx})">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="desc-box" onclick="copiar(${x.idx})" title="Click para copiar">
-                    <pre class="desc-text">${x.descripcion}</pre>
-                </div>
-                <div class="ruta">${x.ruta||''}</div>`;
-                resultsDiv.appendChild(d);
-            });
+                    <div class="desc-box" onclick="copyText(this, ${item.idx})">
+                        <pre class="desc-text">${item.descripcion}</pre>
+                        <div class="copy-hint">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copiar
+                        </div>
+                    </div>
+                    <div class="route-text">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        ${item.ruta || 'General'}
+                    </div>
+                </div>`;
+            }).join('');
         }
-        
-        function copiar(i){ 
-            navigator.clipboard.writeText(db[i].descripcion); 
-            mostrarToast("¡Copiado al portapapeles!"); 
+
+        // --- INTERACCIONES ---
+        window.copyText = (el, idx) => {
+            navigator.clipboard.writeText(db[idx].descripcion);
+            el.classList.add('copied');
+            setTimeout(() => el.classList.remove('copied'), 400);
+            showToast("¡Copiado al portapapeles!");
+        };
+
+        function showToast(msg) {
+            els.toastTxt.innerText = msg;
+            els.toast.classList.add('visible');
+            setTimeout(() => els.toast.classList.remove('visible'), 2000);
         }
-        
-        function mostrarToast(m){ toast.innerText=m; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2000); }
-        function abrirModal(){ editIdx=-1; document.getElementById('inClass').value=document.getElementById('inTitle').value=document.getElementById('inDesc').value=document.getElementById('inRoute').value=""; modalOverlay.classList.add('active'); }
-        function editar(i){ editIdx=i; const x=db[i]; document.getElementById('inClass').value=x.clasificacion||""; document.getElementById('inTitle').value=x.titulo; document.getElementById('inDesc').value=x.descripcion; document.getElementById('inRoute').value=x.ruta||""; modalOverlay.classList.add('active'); }
-        function cerrarModal(){ modalOverlay.classList.remove('active'); }
-        async function guardar(){
-            const o={clasificacion:document.getElementById('inClass').value.trim().toUpperCase(), titulo:document.getElementById('inTitle').value.trim(), descripcion:document.getElementById('inDesc').value, ruta:document.getElementById('inRoute').value.trim()};
-            if(!o.titulo)return alert("Falta título");
-            editIdx===-1?db.unshift(o):db[editIdx]=o; await syncCloud(); cerrarModal(); renderChips(); renderResults(inputBusqueda.value);
-        }
-        function preDelete(i){ deleteIdx=i; deleteOverlay.classList.add('active'); }
-        function cerrarDelete(){ deleteOverlay.classList.remove('active'); deleteIdx=null; }
-        async function confirmDelete(){ if(deleteIdx===null)return; db.splice(deleteIdx,1); await syncCloud(); cerrarDelete(); renderChips(); renderResults(inputBusqueda.value); }
+
+        // --- MODALES ---
+        window.openModal = (idx = -1) => {
+            editIdx = idx;
+            els.modalTitle.innerText = idx === -1 ? "Nueva Tipificación" : "Editar Registro";
+            els.btnSave.innerText = idx === -1 ? "Crear" : "Guardar Cambios";
+            
+            const d = idx === -1 ? {} : db[idx];
+            els.inputs.class.value = d.clasificacion || "";
+            els.inputs.title.value = d.titulo || "";
+            els.inputs.desc.value = d.descripcion || "";
+            els.inputs.route.value = d.ruta || "";
+            
+            els.mainModal.classList.add('active');
+            setTimeout(() => els.inputs.class.focus(), 100);
+        };
+        window.closeModal = () => els.mainModal.classList.remove('active');
+
+        window.saveData = async () => {
+            const item = {
+                clasificacion: els.inputs.class.value.trim().toUpperCase(),
+                titulo: els.inputs.title.value.trim(),
+                descripcion: els.inputs.desc.value,
+                ruta: els.inputs.route.value.trim()
+            };
+            if(!item.titulo) return alert("El título es obligatorio");
+
+            if(editIdx === -1) db.unshift(item);
+            else db[editIdx] = item;
+
+            closeModal();
+            render();
+            await sync();
+        };
+
+        window.askDelete = (idx) => { deleteIdx = idx; els.delModal.classList.add('active'); };
+        window.closeDelete = () => els.delModal.classList.remove('active');
+        window.confirmDelete = async () => {
+            if(deleteIdx !== null) {
+                db.splice(deleteIdx, 1);
+                closeDelete();
+                render();
+                await sync();
+            }
+        };
+
+        // --- EVENTOS DE TECLADO & BUSQUEDA ---
+        els.search.addEventListener('input', (e) => {
+            const hasText = e.target.value.length > 0;
+            els.clearBtn.classList.toggle('visible', hasText);
+            renderResults(e.target.value);
+        });
+
+        els.clearBtn.addEventListener('click', () => {
+            els.search.value = '';
+            els.clearBtn.classList.remove('visible');
+            els.search.focus();
+            renderResults("");
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                els.search.focus();
+                els.search.select();
+            }
+            if(e.key === 'Escape') {
+                if(els.mainModal.classList.contains('active')) closeModal();
+                else if(els.delModal.classList.contains('active')) closeDelete();
+                else if(document.activeElement === els.search || els.search.value.length > 0) {
+                    els.search.value = '';
+                    els.clearBtn.classList.remove('visible');
+                    els.search.blur();
+                    renderResults("");
+                }
+            }
+        });
     </script>
 </body>
 </html>
