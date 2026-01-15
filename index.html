@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Aesthetic)</title>
+    <title>Typify Pro (Ultimate)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS PREMIUM (v40.0 - Glass & Glow)
+           ESTILOS v41.0 (Smart Search & Clean UI)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -30,21 +30,20 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-attachment: fixed; /* Fondo fijo */
+            background-attachment: fixed;
         }
 
-        /* --- FONDO DECORATIVO --- */
+        /* Fondo Decorativo */
         body::before {
             content: ''; position: fixed; top: -100px; left: -100px; width: 500px; height: 500px;
             background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%; z-index: -1; pointer-events: none;
         }
 
-        /* --- ANIMACIONES --- */
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
 
-        /* --- HEADER --- */
+        /* HEADER */
         .header-container { 
             width: 100%; max-width: 750px; text-align: center; margin-bottom: 50px; 
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -58,7 +57,6 @@
             filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
         }
 
-        /* Status Pill */
         .status-pill {
             display: inline-flex; align-items: center; gap: 8px;
             font-size: 0.85rem; font-weight: 600; color: var(--text-sec);
@@ -72,8 +70,25 @@
         .status-pill.active .dot { background: #10b981; animation: pulseGlow 2s infinite; }
         .status-pill.error .dot { background: #ef4444; }
 
-        /* --- BUSCADOR FLOTANTE --- */
-        .search-wrapper { position: relative; width: 100%; max-width: 650px; margin: 0 auto; z-index: 10; }
+        /* --- BUSCADOR FLOTANTE INTELIGENTE --- */
+        .search-wrapper { 
+            position: relative; 
+            width: 100%; 
+            max-width: 650px; 
+            margin: 0 auto; 
+            z-index: 500; /* Alto para estar sobre las tarjetas */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* ESTADO DOCKED (Cuando bajas scroll) */
+        .search-wrapper.docked {
+            position: fixed;
+            top: 20px;
+            right: 20px; /* Al lado derecho */
+            width: 300px; /* Más pequeño */
+            margin: 0;
+            transform-origin: top right;
+        }
         
         .search-input {
             width: 100%; padding: 20px 50px 20px 55px; font-size: 1.15rem;
@@ -81,15 +96,27 @@
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             color: var(--text-main); font-family: inherit; font-weight: 500;
-            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.08), 0 5px 15px -5px rgba(0,0,0,0.04);
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
         }
-        .search-input:focus { 
-            transform: translateY(-2px); 
-            box-shadow: 0 20px 40px -5px rgba(99, 102, 241, 0.15); 
-            outline: none; 
+        
+        /* Ajuste visual cuando está docked */
+        .search-wrapper.docked .search-input {
+            padding: 12px 40px 12px 45px;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.8);
         }
-        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; transition:0.3s; }
+
+        .search-input:focus { transform: translateY(-2px); box-shadow: 0 20px 40px -5px rgba(99, 102, 241, 0.15); outline: none; }
+        
+        .search-icon { 
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
+            color: #94a3b8; pointer-events: none; transition: 0.3s; 
+        }
+        /* Ajuste icono en docked */
+        .search-wrapper.docked .search-icon { left: 15px; width: 18px; height: 18px; }
+
         .search-input:focus + .search-icon { color: var(--primary); }
 
         .btn-clear {
@@ -99,9 +126,10 @@
             opacity: 0; visibility: hidden; transition: 0.2s;
         }
         .btn-clear.visible { opacity: 1; visibility: visible; transform: translateY(-50%) scale(1); }
+        .search-wrapper.docked .btn-clear { right: 10px; width: 24px; height: 24px; } /* Ajuste clear en docked */
         .btn-clear:hover { background: #fee2e2; color: #ef4444; }
 
-        /* --- TAGS (Chips) --- */
+        /* CHIPS */
         .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
         .chip {
             background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.5);
@@ -110,67 +138,37 @@
             transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .chip:hover { background: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: var(--primary); }
-        .chip.active { 
-            background: var(--text-main); color: white; border-color: transparent;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2); transform: scale(1.05);
-        }
+        .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transform: scale(1.05); }
 
-        /* --- CARDS --- */
+        /* CARDS */
         #results { width: 100%; max-width: 800px; display: grid; gap: 24px; padding-bottom: 120px; }
-        
         .card {
             background: var(--card-bg); border-radius: 24px;
             padding: 30px; position: relative; overflow: hidden;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.6);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0; animation: slideUp 0.5s forwards;
         }
-        .card:hover { 
-            transform: translateY(-5px) scale(1.01); 
-            box-shadow: var(--shadow-hover);
-        }
+        .card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-hover); }
 
-        /* Header de la tarjeta */
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        
-        .badge { 
-            display: inline-block; font-size: 0.7rem; font-weight: 800; 
-            padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
+        .badge { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .card-title { font-size: 1.35rem; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; }
 
-        /* Botones de acción (ocultos hasta hover) */
         .actions { display: flex; gap: 8px; opacity: 0; transform: translateX(10px); transition: 0.3s; }
         .card:hover .actions { opacity: 1; transform: translateX(0); }
-        
-        .icon-btn {
-            width: 36px; height: 36px; border-radius: 12px; border: none; background: #f8fafc;
-            color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
+        .icon-btn { width: 36px; height: 36px; border-radius: 12px; border: none; background: #f8fafc; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .icon-btn:hover { background: var(--primary); color: white; transform: rotate(10deg); }
         .icon-btn.del:hover { background: #ef4444; color: white; }
 
-        /* Caja de Descripción (Interactiva) */
         .desc-box {
             background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px;
             padding: 20px; margin-bottom: 16px; cursor: pointer; position: relative;
             transition: all 0.3s ease;
         }
-        .desc-box:hover { 
-            background: #eef2ff; border-color: var(--primary); border-style: solid;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.1);
-        }
+        .desc-box:hover { background: #eef2ff; border-color: var(--primary); border-style: solid; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.1); }
         .desc-box:active { transform: scale(0.98); }
-
-        .desc-text { 
-            font-size: 1.05rem; line-height: 1.6; color: #334155; 
-            white-space: pre-wrap; margin: 0; font-family: inherit; pointer-events: none;
-        }
-
-        /* Tooltip flotante */
+        .desc-text { font-size: 1.05rem; line-height: 1.6; color: #334155; white-space: pre-wrap; margin: 0; font-family: inherit; pointer-events: none; }
         .tooltip-copy {
             position: absolute; top: -12px; right: 20px;
             background: var(--primary); color: white;
@@ -180,67 +178,36 @@
         }
         .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
 
+        /* RUTA LIMPIA (SIN ICONO INICIAL) */
         .route { 
             font-family: 'Courier New', monospace; font-size: 0.85rem; color: #94a3b8; 
-            display: flex; align-items: center; gap: 8px; font-weight: 600;
+            font-weight: 600; padding-left: 5px;
         }
 
-        /* --- FAB BUTTON --- */
-        .fab {
-            position: fixed; bottom: 40px; right: 40px; 
-            width: 65px; height: 65px; border-radius: 50%;
-            background: var(--text-main); color: white; border: none;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.25); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100;
-        }
+        .fab { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 15px 30px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.4s; z-index: 100; }
         .fab:hover { transform: scale(1.1) rotate(90deg); background: var(--primary); }
 
-        /* --- TOAST --- */
-        #toast {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(50px);
-            background: #1e293b; color: white; padding: 12px 30px; border-radius: 50px;
-            font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000; display: flex; align-items: center; gap: 10px;
-        }
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(50px); background: #1e293b; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 1000; display: flex; align-items: center; gap: 10px; }
         #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-        /* --- MODAL --- */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200;
-        }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 200; }
         .overlay.active { opacity: 1; visibility: visible; }
-        
-        .modal {
-            background: white; width: 90%; max-width: 500px; padding: 40px;
-            border-radius: 30px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.2);
-            transform: scale(0.9); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .modal { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 30px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.3s; }
         .overlay.active .modal { transform: scale(1); }
-
+        
         .input-group { margin-bottom: 20px; }
         .input-label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
-        .input-field { 
-            width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9;
-            font-family: inherit; font-size: 1rem; color: var(--text-main);
-            background: #f8fafc; transition: 0.2s; box-sizing: border-box;
-        }
+        .input-field { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; }
         .input-field:focus { border-color: var(--primary); background: white; outline: none; }
-
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
         .btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
         .btn-cancel { background: transparent; color: #94a3b8; }
         .btn-cancel:hover { background: #f1f5f9; color: var(--text-main); }
         .btn-confirm { background: var(--text-main); color: white; }
-        .btn-confirm:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
+        .btn-confirm:hover { background: var(--primary); transform: translateY(-2px); }
         .btn-delete { background: #fee2e2; color: #ef4444; }
         .btn-delete:hover { background: #ef4444; color: white; }
 
-        /* Loader */
         .loader { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
         .loader.hidden { opacity: 0; pointer-events: none; }
     </style>
@@ -259,7 +226,7 @@
             <span id="statusTxt">Conectando...</span>
         </div>
 
-        <div class="search-wrapper">
+        <div id="searchWrapper" class="search-wrapper">
             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="searchIn" class="search-input" placeholder="Buscar... (Presiona Ctrl + F)" autocomplete="off">
             <button id="clearBtn" class="btn-clear">
@@ -300,7 +267,7 @@
             </div>
             <div class="input-group">
                 <label class="input-label">Ruta / Sistema</label>
-                <input id="inRoute" class="input-field" placeholder="CRM > Opción...">
+                <input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación">
             </div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="modalClose()">Cancelar</button>
@@ -328,17 +295,16 @@
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
 
-        // STATE
         let db = [];
         let editIdx = -1;
         let filtro = "TODOS";
         let deleteIdx = null;
 
-        // DOM ELEMENTS
         const el = {
             loader: document.getElementById('loader'),
             status: document.getElementById('statusEl'),
             statusTxt: document.getElementById('statusTxt'),
+            searchWrap: document.getElementById('searchWrapper'), // Wrapper para efecto Dock
             search: document.getElementById('searchIn'),
             clear: document.getElementById('clearBtn'),
             chips: document.getElementById('chips'),
@@ -346,22 +312,24 @@
             modal: document.getElementById('modalMain'),
             modalDel: document.getElementById('modalDel'),
             toast: document.getElementById('toast'),
-            in: {
-                c: document.getElementById('inClass'),
-                t: document.getElementById('inTitle'),
-                d: document.getElementById('inDesc'),
-                r: document.getElementById('inRoute')
-            },
+            in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute') },
             mTitle: document.getElementById('modalTitle'),
             btnSave: document.getElementById('btnSave')
         };
 
-        // INIT
         window.onload = () => { el.search.focus(); init(); };
+
+        // --- DETECCIÓN DE SCROLL PARA BUSCADOR FLOTANTE ---
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 150) {
+                el.searchWrap.classList.add('docked');
+            } else {
+                el.searchWrap.classList.remove('docked');
+            }
+        });
 
         async function init() {
             const t = setTimeout(() => { if(!db.length) { setStatus(false, "Modo Local"); db=localLoad(); el.loader.classList.add('hidden'); render(); }}, 5000);
-            
             try {
                 const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {headers:{'X-Master-Key':MASTER_KEY}});
                 if(!r.ok) throw new Error();
@@ -369,52 +337,34 @@
                 db = Array.isArray(d.record) ? d.record : [];
                 setStatus(true, "Sincronizado");
                 clearTimeout(t);
-            } catch(e) {
-                setStatus(false, "Desconectado");
-                db = localLoad();
-            }
-            render();
-            el.loader.classList.add('hidden');
+            } catch(e) { setStatus(false, "Desconectado"); db = localLoad(); }
+            render(); el.loader.classList.add('hidden');
         }
 
-        // LOGIC
-        function setStatus(ok, txt) {
-            el.status.className = `status-pill ${ok?'active':'error'}`;
-            el.statusTxt.innerText = txt;
-        }
+        function setStatus(ok, txt) { el.status.className = `status-pill ${ok?'active':'error'}`; el.statusTxt.innerText = txt; }
         function localLoad() { return JSON.parse(localStorage.getItem('typify_db')) || []; }
         
         async function sync() {
             el.loader.classList.remove('hidden');
             localStorage.setItem('typify_db', JSON.stringify(db));
             try {
-                const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY}, body:JSON.stringify(db)
-                });
+                const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY}, body:JSON.stringify(db) });
                 if(!r.ok) throw new Error();
-                setStatus(true, "Guardado");
-                toast("Cambios guardados exitosamente");
-            } catch(e) {
-                setStatus(false, "Error Guardado");
-                alert("Error al subir a la nube. Se guardó localmente.");
-            }
+                setStatus(true, "Guardado"); toast("Cambios guardados");
+            } catch(e) { setStatus(false, "Error Guardado"); alert("Error al subir a la nube. Se guardó localmente."); }
             el.loader.classList.add('hidden');
         }
 
-        // RENDER
-        const colors = [
-            {bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'},
-            {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'},
-            {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}
-        ];
+        const colors = [{bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'}, {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'}, {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}];
         function getColor(s) { if(!s) return colors[0]; let h=0; for(let i=0;i<s.length;i++)h+=s.charCodeAt(i); return colors[h%colors.length]; }
 
         function render() {
-            // Chips
-            const cats = ["TODOS", ...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
+            // ORDENAR CHIPS: TODOS PRIMERO
+            const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
+            const cats = ["TODOS", ...uniqueCats]; // Forzamos TODOS al inicio
+            
             el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
 
-            // Cards
             const q = el.search.value.toLowerCase();
             const list = db.map((x,i)=>({...x,i})).filter(x => (filtro==="TODOS"||x.clasificacion===filtro) && (x.titulo.toLowerCase().includes(q)||x.descripcion.toLowerCase().includes(q)));
             
@@ -422,6 +372,9 @@
 
             el.res.innerHTML = list.map(x => {
                 const c = getColor(x.clasificacion);
+                // RUTA: Sin icono inicial, solo texto
+                const rutaHTML = x.ruta ? `<div class="route">${x.ruta}</div>` : '';
+                
                 return `
                 <div class="card" style="animation-delay:${x.i*0.05}s">
                     <div class="card-header">
@@ -438,58 +391,33 @@
                         <div class="tooltip-copy">CLICK PARA COPIAR</div>
                         <pre class="desc-text">${x.descripcion}</pre>
                     </div>
-                    <div class="route"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> ${x.ruta||'General'}</div>
+                    ${rutaHTML}
                 </div>`;
             }).join('');
         }
 
         window.setFilter = c => { filtro = c; render(); };
         function escapeHtml(text) { return text.replace(/'/g, "\\'"); }
-
-        // INTERACTIONS
         window.copy = (txt) => { navigator.clipboard.writeText(txt); toast("¡Copiado!"); };
-        function toast(msg) { 
-            document.getElementById('toastMsg').innerText = msg;
-            el.toast.classList.add('visible'); 
-            setTimeout(()=>el.toast.classList.remove('visible'), 2000); 
-        }
-
-        // MODALS
+        function toast(msg) { document.getElementById('toastMsg').innerText = msg; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
         window.modalOpen = (idx=-1) => {
-            editIdx = idx;
-            el.mTitle.innerText = idx===-1 ? "Nueva Tipificación" : "Editar Registro";
-            el.btnSave.innerText = idx===-1 ? "Crear" : "Guardar Cambios";
-            const d = idx===-1 ? {} : db[idx];
-            el.in.c.value = d.clasificacion||""; el.in.t.value = d.titulo||"";
-            el.in.d.value = d.descripcion||""; el.in.r.value = d.ruta||"";
+            editIdx = idx; el.mTitle.innerText = idx===-1 ? "Nueva Tipificación" : "Editar Registro"; el.btnSave.innerText = idx===-1 ? "Crear" : "Guardar Cambios";
+            const d = idx===-1 ? {} : db[idx]; el.in.c.value = d.clasificacion||""; el.in.t.value = d.titulo||""; el.in.d.value = d.descripcion||""; el.in.r.value = d.ruta||"";
             el.modal.classList.add('active'); setTimeout(()=>el.in.c.focus(), 100);
         };
         window.modalClose = () => el.modal.classList.remove('active');
-        
         window.saveData = async () => {
-            const obj = {
-                clasificacion: el.in.c.value.trim().toUpperCase(),
-                titulo: el.in.t.value.trim(),
-                descripcion: el.in.d.value,
-                ruta: el.in.r.value.trim()
-            };
+            const obj = { clasificacion: el.in.c.value.trim().toUpperCase(), titulo: el.in.t.value.trim(), descripcion: el.in.d.value, ruta: el.in.r.value.trim() };
             if(!obj.titulo) return alert("Falta el título");
-            
-            editIdx===-1 ? db.unshift(obj) : db[editIdx] = obj;
-            modalClose(); render(); await sync();
+            editIdx===-1 ? db.unshift(obj) : db[editIdx] = obj; modalClose(); render(); await sync();
         };
-
         window.delAsk = (i) => { deleteIdx=i; el.modalDel.classList.add('active'); };
         window.delClose = () => el.modalDel.classList.remove('active');
         window.delConfirm = async () => { if(deleteIdx!==null){ db.splice(deleteIdx,1); delClose(); render(); await sync(); }};
 
-        // EVENTS
         el.search.addEventListener('input', e => { el.clear.classList.toggle('visible', e.target.value.length>0); render(); });
         el.clear.onclick = () => { el.search.value=''; el.clear.classList.remove('visible'); el.search.focus(); render(); };
-        document.addEventListener('keydown', e => {
-            if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f') { e.preventDefault(); el.search.focus(); el.search.select(); }
-            if(e.key==='Escape') { modalClose(); delClose(); if(document.activeElement===el.search) el.clear.click(); }
-        });
+        document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f') { e.preventDefault(); el.search.focus(); el.search.select(); } if(e.key==='Escape') { modalClose(); delClose(); if(document.activeElement===el.search) el.clear.click(); }});
     </script>
 </body>
 </html>
