@@ -127,7 +127,7 @@
 
     <script>
         // ===========================================
-        //  CONFIGURACIÓN FINAL
+        //  TUS LLAVES DE ACCESO (YA CONFIGURADAS)
         // ===========================================
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
@@ -228,7 +228,30 @@
         
         window.onload = () => { inputBusqueda.focus(); initApp(); };
         inputBusqueda.addEventListener('input', () => { btnLimpiar.classList.toggle('visible', inputBusqueda.value.length>0); renderResults(inputBusqueda.value); });
-        btnLimpiar.onclick = () => { inputBusqueda.value=''; btnLimpiar.classList.remove('visible'); renderResults(); };
+        
+        // --- ATAJOS DE TECLADO MEJORADOS ---
+        document.addEventListener('keydown', (e) => {
+            // CTRL + F: Ir al buscador
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                e.preventDefault(); // Evita el buscador del navegador
+                inputBusqueda.focus();
+                inputBusqueda.select();
+            }
+            // ESC: Limpiar todo
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                limpiar();
+            }
+        });
+
+        // Función Limpiar (Botón X y ESC)
+        function limpiar() {
+            inputBusqueda.value = '';
+            btnLimpiar.classList.remove('visible');
+            inputBusqueda.focus();
+            renderResults("");
+        }
+        btnLimpiar.addEventListener('click', limpiar);
 
         function renderChips() {
             const cats = ["TODOS", ...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
