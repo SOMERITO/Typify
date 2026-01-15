@@ -212,9 +212,9 @@
 
     <script>
         // ===========================================
-        // CONFIGURACIÓN NUBE (BIN PRIVADO)
+        // CONFIGURACIÓN NUBE (NUEVO ID)
         // ===========================================
-        const BIN_ID = '69680821ae596e708fdcc510'; // BIN PRIVADO
+        const BIN_ID = '69681a15d0ea881f406c588a'; // NUEVO ID PÚBLICO
         const MASTER_KEY = '$2a$10$rbQNmKHZB95qMFO9kbzxwe3g8vO70vkKhSX7NrbuvZFYShj7duOOi';
 
         let db = [];
@@ -226,30 +226,44 @@
         const statusEl = document.getElementById('cloudStatus');
         
         async function initApp() {
-            // Safety: Si no carga en 4s, forzar entrada local
+            // ANTI-FREEZE: Si tarda más de 3s, asumimos que es nuevo y desbloqueamos
             const t = setTimeout(() => { 
-                if(db.length===0) setStatus("⚠️ Modo Local (Timeout)",false); 
-                loader.classList.add('hidden'); 
-            }, 4000);
+                if(db.length===0) {
+                    console.warn("Tiempo excedido, iniciando DB vacía");
+                    setStatus("✨ Lista Nueva", true);
+                    loader.classList.add('hidden'); 
+                }
+            }, 3000);
 
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
-                    headers: { 'X-Master-Key': MASTER_KEY, 'X-Bin-Meta': false } 
+                    headers: { 'X-Master-Key': MASTER_KEY } 
                 });
                 
                 if(!res.ok) throw new Error("Error API: " + res.status);
                 
                 const data = await res.json();
-                db = Array.isArray(data) ? data : (data.record || []);
+                
+                // Si el bin es nuevo, JSONBin devuelve el objeto vacío o metadatos
+                // Validamos si es un array
+                if (Array.isArray(data.record)) {
+                    db = data.record;
+                    setStatus("☁️ Nube Sincronizada", true);
+                } else {
+                    // Si no es array, es un bin nuevo vacío
+                    db = [];
+                    setStatus("✨ Bin Nuevo Listo", true);
+                }
                 
                 clearTimeout(t);
-                setStatus("☁️ Nube Sincronizada", true);
             } catch (e) {
-                console.warn("Cargando local por error:", e);
+                console.warn(e);
+                // Si falla la conexión, cargamos local y desbloqueamos
                 setStatus("⚠️ Modo Local", false);
                 db = JSON.parse(localStorage.getItem('misTipificaciones')) || [];
             }
             
+            // SIEMPRE renderizamos y quitamos el loader
             renderChips();
             renderResults();
             loader.classList.add('hidden');
@@ -265,24 +279,22 @@
             localStorage.setItem('misTipificaciones', JSON.stringify(db));
             
             try {
-                // Header importante: X-Bin-Versioning: false
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
                     headers: { 
                         'Content-Type': 'application/json', 
-                        'X-Master-Key': MASTER_KEY,
-                        'X-Bin-Versioning': 'false' 
+                        'X-Master-Key': MASTER_KEY 
                     },
                     body: JSON.stringify(db)
                 });
                 
-                if(!res.ok) throw new Error("Error HTTP: " + res.status);
+                if(!res.ok) throw new Error("Error al guardar");
                 setStatus("☁️ Guardado en Nube", true);
                 mostrarToast("✅ Sincronizado");
             } catch (e) {
                 console.error(e);
-                setStatus("⚠️ Guardado solo Local", false);
-                alert("Error de conexión. Se guardó localmente.");
+                setStatus("⚠️ Guardado Local", false);
+                alert("No se pudo subir a la nube. Se guardó localmente.");
             }
             loader.classList.add('hidden');
         }
@@ -377,7 +389,7 @@
                     return matchText && matchFiltro;
                 });
 
-            if(db.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:40px;">Lista vacía (Usa + para crear).</div>'; return; }
+            if(db.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:40px;">Lista vacía (Añada registros con +).</div>'; return; }
             if(filtered.length === 0) { resultsDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;">Sin resultados.</div>'; return; }
 
             filtered.forEach((item, i) => {
@@ -416,7 +428,7 @@
         }
 
         function copiar(idx) {
-            navigator.clipboard.writeText(db[idx].descripcion).then(() => { mostrarToast("¡Copiado al portapapeles!"); });
+            navigator.clipboard.writeText(db[idx].descripcion).then(() => { mostrarToast("¡Copiado!"); });
         }
         function mostrarToast(msg) { toast.innerText = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
 
