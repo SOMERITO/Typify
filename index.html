@@ -3,413 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Fixed)</title>
+    <title>Typify Pro (Center & Delay)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v42.0 (Z-Index Fix)
+           ESTILOS v55.0 (Center Preview & Forced Load)
            ========================================= */
         :root {
             --primary: #6366f1;
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --bg-gradient: linear-gradient(to bottom right, #f0f9ff, #e0e7ff);
             --text-main: #1e293b;
             --text-sec: #64748b;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
-            --shadow-hover: 0 20px 50px -12px rgba(79, 70, 229, 0.15);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-gradient);
             color: var(--text-main);
-            margin: 0;
-            padding: 60px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 0;
             min-height: 100vh;
-            background-attachment: fixed;
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #eff6ff, #e0e7ff, #f5f3ff, #ecfdf5);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* GRID */
+        .main-container {
+            max-width: 1400px; margin: 0 auto; padding: 40px 20px;
+            display: grid; grid-template-columns: 0px 1fr; gap: 0px; 
+            align-items: start; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .main-container.has-sidebar { grid-template-columns: 340px 1fr; gap: 40px; }
+        @media (max-width: 1000px) { .main-container.has-sidebar { grid-template-columns: 1fr; } .sidebar { display: none !important; } }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: sticky; top: 100px;
+            background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 24px; padding: 0 20px; 
+            opacity: 0; overflow: hidden; height: 0; pointer-events: none;
+            transform: translateX(-50px); transition: all 0.5s ease; z-index: 100;
+        }
+        .main-container.has-sidebar .sidebar {
+            opacity: 1; height: auto; padding: 25px; transform: translateX(0); pointer-events: all;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .sidebar::-webkit-scrollbar { width: 0px; background: transparent; }
+        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(99, 102, 241, 0.1); }
+        .sidebar-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); font-weight: 800; }
+
+        /* MINI CARDS */
+        .mini-card {
+            display: flex; align-items: center; gap: 12px; background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; padding: 16px; 
+            margin-bottom: 12px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .mini-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); opacity: 0.6; transition: 0.3s; }
+        .mini-card:hover { transform: translateX(5px); box-shadow: 0 12px 25px -8px rgba(99, 102, 241, 0.25); border-color: rgba(99, 102, 241, 0.3); }
+        .mini-card:hover::before { opacity: 1; width: 6px; }
+        .mini-icon-circle { min-width: 32px; height: 32px; border-radius: 10px; background: #eff6ff; color: var(--primary); display: flex; align-items: center; justify-content: center; }
+        .mini-content { flex: 1; min-width: 0; }
+        .mini-title { font-weight: 700; font-size: 0.9rem; color: #334155; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .mini-arrow { opacity: 0; transform: translateX(-10px); color: var(--primary); transition: 0.3s; }
+        .mini-card:hover .mini-arrow { opacity: 1; transform: translateX(0); }
+
+        /* --- SKELETON (SHIMMER ALTO CONTRASTE) --- */
+        .skeleton-card {
+            background: rgba(255, 255, 255, 0.8); /* Fondo más blanco */
+            border-radius: 28px; padding: 35px;
+            border: 1px solid rgba(203, 213, 225, 0.5); /* Borde visible */
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
         }
 
-        body::before {
-            content: ''; position: fixed; top: -100px; left: -100px; width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%; z-index: -1; pointer-events: none;
-        }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
-
-        /* HEADER */
-        .header-container { 
-            width: 100%; max-width: 750px; text-align: center; margin-bottom: 50px; 
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        .sk-line {
+            height: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            /* Gradiente de alto contraste para que se note la carga */
+            background: #cbd5e1; 
+            background: linear-gradient(to right, #cbd5e1 8%, #94a3b8 18%, #cbd5e1 33%);
+            background-size: 800px 104px;
+            animation: shimmer 1.2s infinite linear forwards;
         }
         
-        h1 { 
-            margin: 0 0 10px 0; 
-            font-size: 3rem; font-weight: 800; letter-spacing: -0.03em;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
+        @keyframes shimmer {
+            0% { background-position: -468px 0; }
+            100% { background-position: 468px 0; }
         }
 
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-size: 0.85rem; font-weight: 600; color: var(--text-sec);
-            background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
-            padding: 8px 16px; border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 35px;
-        }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
-        .status-pill.active .dot { background: #10b981; animation: pulseGlow 2s infinite; }
-        .status-pill.error .dot { background: #ef4444; }
+        .sk-w40 { width: 40%; height: 28px; margin-bottom: 25px; } 
+        .sk-w20 { width: 20%; height: 16px; } 
+        .sk-block { width: 100%; height: 100px; margin-top: 20px; }
 
-        /* --- BUSCADOR (CORREGIDO Z-INDEX) --- */
-        .search-wrapper { 
-            position: relative; 
-            width: 100%; 
-            max-width: 650px; 
-            margin: 0 auto; 
-            z-index: 100; /* Nivel medio: Encima de las tarjetas, pero debajo del modal */
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        .search-wrapper.docked {
-            position: fixed; top: 20px; right: 20px; width: 300px; margin: 0;
-            transform-origin: top right;
-        }
-        
-        .search-input {
-            width: 100%; padding: 20px 50px 20px 55px; font-size: 1.15rem;
-            border: none; border-radius: 24px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            color: var(--text-main); font-family: inherit; font-weight: 500;
-            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .search-wrapper.docked .search-input {
-            padding: 12px 40px 12px 45px; font-size: 0.95rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.8);
-        }
 
-        .search-input:focus { transform: translateY(-2px); box-shadow: 0 20px 40px -5px rgba(99, 102, 241, 0.15); outline: none; }
-        
-        .search-icon { 
-            position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
-            color: #94a3b8; pointer-events: none; transition: 0.3s; 
+        /* --- PREVIEW GLASS (CENTRADO PERFECTO) --- */
+        .preview-glass {
+            position: fixed; 
+            top: 50%; 
+            left: 50%; /* CENTRO ABSOLUTO */
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%; max-width: 700px; max-height: 85vh; 
+            display: flex; flex-direction: column;
+            
+            background: rgba(255, 255, 255, 0.95); /* Casi opaco para mejor lectura */
+            backdrop-filter: blur(40px);
+            border: 1px solid white; border-radius: 32px; padding: 50px; 
+            z-index: 1500;
+            
+            opacity: 0; visibility: hidden; pointer-events: none; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.4);
         }
-        .search-wrapper.docked .search-icon { left: 15px; width: 18px; height: 18px; }
+        .preview-glass.active { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+        .preview-header { margin-bottom: 20px; border-bottom: 2px dashed rgba(0,0,0,0.1); padding-bottom: 20px; flex-shrink: 0; }
+        .preview-badge { background: var(--primary); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
+        .preview-title { font-size: 2.2rem; font-weight: 800; color: #1e293b; line-height: 1.1; }
+        .preview-body-container { overflow-y: auto; padding-right: 15px; flex-grow: 1; }
+        .preview-body-container::-webkit-scrollbar { width: 6px; }
+        .preview-body-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .preview-body { font-size: 1.2rem; color: #475569; line-height: 1.7; white-space: pre-wrap; }
 
+        /* RESTO */
+        .content-area { width: 100%; max-width: 800px; margin: 0 auto; transition: margin 0.5s ease; }
+        .main-container.has-sidebar .content-area { margin: 0; }
+        .header-section { grid-column: 1 / -1; text-align: center; margin-bottom: 40px; }
+        h1 { margin: 0 0 10px 0; font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 50%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .search-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; z-index: 100; transition: all 0.5s; }
+        .search-wrapper.docked { position: fixed; top: 20px; right: 20px; width: 320px; margin: 0; z-index: 500; }
+        .search-input { width: 100%; padding: 22px 60px; font-size: 1.2rem; border: none; border-radius: 30px; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); color: var(--text-main); font-family: inherit; font-weight: 600; box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15); transition: 0.3s; }
+        .search-wrapper.docked .search-input { padding: 14px 45px; font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .search-input:focus { transform: translateY(-3px); box-shadow: 0 25px 50px -10px rgba(99, 102, 241, 0.25), inset 0 0 0 2px var(--primary); outline: none; background: rgba(255,255,255,0.95); }
+        .search-icon { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; transition: 0.3s; }
+        .search-wrapper.docked .search-icon { left: 18px; width: 18px; height: 18px; }
         .search-input:focus + .search-icon { color: var(--primary); }
-
-        .btn-clear {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%) scale(0.8);
-            width: 30px; height: 30px; border-radius: 50%; border: none; background: #f1f5f9;
-            color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: 0.2s;
-        }
+        .btn-clear { position: absolute; right: 20px; top: 50%; transform: translateY(-50%) scale(0.8); width: 32px; height: 32px; border-radius: 50%; border: none; background: #f1f5f9; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
         .btn-clear.visible { opacity: 1; visibility: visible; transform: translateY(-50%) scale(1); }
-        .search-wrapper.docked .btn-clear { right: 10px; width: 24px; height: 24px; }
-        .btn-clear:hover { background: #fee2e2; color: #ef4444; }
-
-        /* CHIPS */
-        .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
-        .chip {
-            background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.5);
-            color: var(--text-sec); padding: 8px 20px; border-radius: 100px;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .chip:hover { background: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: var(--primary); }
-        .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transform: scale(1.05); }
-
-        /* CARDS */
-        #results { width: 100%; max-width: 800px; display: grid; gap: 24px; padding-bottom: 120px; }
-        .card {
-            background: var(--card-bg); border-radius: 24px;
-            padding: 30px; position: relative; overflow: hidden;
-            box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.6);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0; animation: slideUp 0.5s forwards;
-            z-index: 10;
-        }
-        .card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-hover); z-index: 20; }
-
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .badge { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .card-title { font-size: 1.35rem; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; }
-
-        .actions { display: flex; gap: 8px; opacity: 0; transform: translateX(10px); transition: 0.3s; }
-        .card:hover .actions { opacity: 1; transform: translateX(0); }
-        .icon-btn { width: 36px; height: 36px; border-radius: 12px; border: none; background: #f8fafc; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .icon-btn:hover { background: var(--primary); color: white; transform: rotate(10deg); }
-        .icon-btn.del:hover { background: #ef4444; color: white; }
-
-        .desc-box {
-            background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px;
-            padding: 20px; margin-bottom: 16px; cursor: pointer; position: relative;
-            transition: all 0.3s ease;
-        }
-        .desc-box:hover { background: #eef2ff; border-color: var(--primary); border-style: solid; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.1); }
-        .desc-box:active { transform: scale(0.98); }
-        .desc-text { font-size: 1.05rem; line-height: 1.6; color: #334155; white-space: pre-wrap; margin: 0; font-family: inherit; pointer-events: none; }
-        .tooltip-copy {
-            position: absolute; top: -12px; right: 20px;
-            background: var(--primary); color: white;
-            font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
-            opacity: 0; transform: translateY(10px); transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); pointer-events: none;
-        }
-        .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
-
-        .route { 
-            font-family: 'Courier New', monospace; font-size: 0.85rem; color: #94a3b8; 
-            font-weight: 600; padding-left: 5px;
-        }
-
-        .fab { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 15px 30px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.4s; z-index: 90; }
-        .fab:hover { transform: scale(1.1) rotate(90deg); background: var(--primary); }
-
-        /* --- TOAST --- */
-        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(50px); background: #1e293b; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2500; display: flex; align-items: center; gap: 10px; }
-        #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-
-        /* --- MODAL (CAPA SUPERIOR - Nivel 2000) --- */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); 
-            display: flex; justify-content: center; align-items: center; 
-            opacity: 0; visibility: hidden; transition: 0.3s; 
-            z-index: 2000; /* ESTO ARREGLA EL BUG */
-        }
-        .overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 30px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.3s; }
-        .overlay.active .modal { transform: scale(1); }
+        .search-wrapper.docked .btn-clear { right: 12px; width: 26px; height: 26px; }
+        .status-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-sec); background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.5); margin-bottom: 30px; }
+        .status-pill.active .dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+        .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 35px; }
+        .chip { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.4); color: var(--text-sec); padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .chip:hover { background: white; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15); color: var(--primary); }
+        .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transform: scale(1.05); }
         
-        .input-group { margin-bottom: 20px; }
-        .input-label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
-        .input-field { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; }
+        #results { display: grid; gap: 28px; padding-bottom: 60px; }
+        .card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 28px; padding: 35px; position: relative; overflow: hidden; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); transition: 0.4s; opacity: 0; transform: translateY(30px); }
+        .card.visible { opacity: 1; transform: translateY(0); }
+        .card:hover { transform: translateY(-8px) scale(1.005); box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.95); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 10px; text-transform: uppercase; margin-bottom: 10px; }
+        .card-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; line-height: 1.2; }
+        .actions { display: flex; gap: 10px; opacity: 0; transform: translateX(15px); transition: 0.3s; }
+        .card:hover .actions { opacity: 1; transform: translateX(0); }
+        .icon-btn { width: 42px; height: 42px; border-radius: 14px; border: none; background: #f1f5f9; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .icon-btn:hover { background: var(--primary); color: white; transform: rotate(12deg) scale(1.1); }
+        .icon-btn.del:hover { background: #ef4444; color: white; }
+        .desc-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 24px; margin-bottom: 20px; cursor: pointer; position: relative; transition: 0.3s; }
+        .desc-box:hover { background: #eff6ff; border-color: var(--primary); border-style: solid; box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.2); transform: scale(1.01); }
+        .desc-box:active { transform: scale(0.98); }
+        .desc-text { font-size: 1.1rem; line-height: 1.7; color: #334155; white-space: pre-wrap; pointer-events: none; margin: 0; }
+        .tooltip-copy { position: absolute; top: -14px; right: 25px; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 800; padding: 5px 15px; border-radius: 20px; opacity: 0; transform: translateY(15px); transition: 0.3s; pointer-events: none; }
+        .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
+        .route { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #94a3b8; font-weight: 600; padding-left: 5px; display: flex; align-items: center; gap:8px;}
+        .fab { position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s; z-index: 90; }
+        .fab:hover { transform: scale(1.15) rotate(90deg); background: var(--primary); }
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(60px); background: #0f172a; color: white; padding: 16px 35px; border-radius: 60px; font-weight: 700; opacity: 0; visibility: hidden; transition: 0.5s; z-index: 2500; display: flex; align-items: center; gap: 12px; }
+        #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2000; }
+        .overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: #fff; width: 90%; max-width: 550px; padding: 45px; border-radius: 35px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); transform: scale(0.9) translateY(20px); transition: 0.4s; }
+        .overlay.active .modal { transform: scale(1) translateY(0); }
+        .input-group { margin-bottom: 24px; }
+        .input-label { display: block; font-size: 0.8rem; font-weight: 800; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
+        .input-field { width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #f1f5f9; font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; }
         .input-field:focus { border-color: var(--primary); background: white; outline: none; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
-        .btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .link-control { display: flex; gap: 10px; }
+        .btn-add-link { background: var(--primary); color: white; border: none; border-radius: 14px; width: 55px; cursor: pointer; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-add-link:hover { background: #4338ca; transform: scale(1.05); }
+        .links-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; min-height: 40px; }
+        .link-pill { background: #e0e7ff; color: var(--primary); padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .link-pill:hover { background: #c7d2fe; }
+        .link-remove { cursor: pointer; font-weight: 900; opacity: 0.6; transition: 0.2s; }
+        .link-remove:hover { opacity: 1; color: #ef4444; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 40px; }
+        .btn { padding: 14px 28px; border-radius: 14px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 1rem; }
         .btn-cancel { background: transparent; color: #94a3b8; }
-        .btn-cancel:hover { background: #f1f5f9; color: var(--text-main); }
+        .btn-cancel:hover { background: #f8fafc; color: var(--text-main); }
         .btn-confirm { background: var(--text-main); color: white; }
-        .btn-confirm:hover { background: var(--primary); transform: translateY(-2px); }
+        .btn-confirm:hover { background: var(--primary); transform: translateY(-3px); }
         .btn-delete { background: #fee2e2; color: #ef4444; }
         .btn-delete:hover { background: #ef4444; color: white; }
-
-        .loader { position: fixed; inset: 0; background: white; z-index: 3000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
+        .loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 3000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
         .loader.hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loader">
-        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
     </div>
 
-    <div class="header-container">
-        <h1>Typify Pro</h1>
+    <div id="previewCard" class="preview-glass">
+        <div class="preview-header">
+            <span id="prevBadge" class="preview-badge">Categoría</span>
+            <div id="prevTitle" class="preview-title">Título</div>
+        </div>
+        <div class="preview-body-container">
+            <div id="prevDesc" class="preview-body">Descripción...</div>
+        </div>
+    </div>
+
+    <div id="mainContainer" class="main-container">
         
-        <div id="statusEl" class="status-pill">
-            <div class="dot"></div>
-            <span id="statusTxt">Conectando...</span>
+        <div class="header-section">
+            <h1>Typify Pro</h1>
+            <div id="statusEl" class="status-pill"><div class="dot"></div><span id="statusTxt">Conectando...</span></div>
+
+            <div id="searchWrapper" class="search-wrapper">
+                <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchIn" class="search-input" placeholder="Buscar... (Presiona Ctrl + F)" autocomplete="off">
+                <button id="clearBtn" class="btn-clear">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="chips" class="chips-container"></div>
         </div>
 
-        <div id="searchWrapper" class="search-wrapper">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchIn" class="search-input" placeholder="Buscar... (Presiona Ctrl + F)" autocomplete="off">
-            <button id="clearBtn" class="btn-clear">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <div class="sidebar-title">SUGERENCIAS</div>
+            </div>
+            <div id="sidebarContent"></div>
+        </aside>
 
-        <div id="chips" class="chips-container"></div>
+        <main class="content-area">
+            <div id="results"></div>
+        </main>
     </div>
-
-    <div id="results"></div>
 
     <button class="fab" onclick="modalOpen()">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
-
     <div id="toast">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <span id="toastMsg">Copiado al portapapeles</span>
     </div>
 
     <div class="overlay" id="modalMain">
         <div class="modal">
-            <h2 id="modalTitle" style="margin:0 0 30px 0; font-size:1.8rem;">Nueva Tipificación</h2>
-            <div style="display:flex; gap:15px;">
-                <div class="input-group" style="flex:1">
-                    <label class="input-label">Clasificación</label>
-                    <input id="inClass" class="input-field" placeholder="Ej: PASOS">
-                </div>
-                <div class="input-group" style="flex:2">
-                    <label class="input-label">Título</label>
-                    <input id="inTitle" class="input-field" placeholder="Título corto">
-                </div>
+            <h2 id="modalTitle" style="margin:0 0 30px 0; font-size:2rem; font-weight:800; color:#1e293b;">Nueva Tipificación</h2>
+            <div style="display:flex; gap:20px;">
+                <div class="input-group" style="flex:1"><label class="input-label">Clasificación</label><input id="inClass" class="input-field" placeholder="Ej: PASOS"></div>
+                <div class="input-group" style="flex:2"><label class="input-label">Título</label><input id="inTitle" class="input-field" placeholder="Título corto"></div>
             </div>
+            <div class="input-group"><label class="input-label">Descripción</label><textarea id="inDesc" class="input-field" rows="4" placeholder="El texto que necesitas copiar..."></textarea></div>
+            <div class="input-group"><label class="input-label">Ruta / Sistema</label><input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación"></div>
+            
             <div class="input-group">
-                <label class="input-label">Descripción</label>
-                <textarea id="inDesc" class="input-field" rows="5" placeholder="El texto que necesitas copiar..."></textarea>
+                <label class="input-label">🔗 Enlazar otras Tipificaciones (Opcional)</label>
+                <div class="link-control">
+                    <input id="inLinkInput" class="input-field" list="allTitles" placeholder="Busca por título para enlazar...">
+                    <datalist id="allTitles"></datalist>
+                    <button class="btn-add-link" onclick="addLink()" title="Agregar sugerencia">+</button>
+                </div>
+                <div id="activeLinksArea" class="links-list"></div>
             </div>
-            <div class="input-group">
-                <label class="input-label">Ruta / Sistema</label>
-                <input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación">
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-cancel" onclick="modalClose()">Cancelar</button>
-                <button id="btnSave" class="btn btn-confirm" onclick="saveData()">Guardar</button>
-            </div>
+
+            <div class="modal-actions"><button class="btn btn-cancel" onclick="modalClose()">Cancelar</button><button id="btnSave" class="btn btn-confirm" onclick="saveData()">Guardar</button></div>
         </div>
     </div>
 
     <div class="overlay" id="modalDel">
         <div class="modal" style="max-width:380px; text-align:center;">
-            <div style="width:70px; height:70px; background:#fef2f2; color:#ef4444; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-            </div>
-            <h3 style="margin:0 0 10px 0; font-size:1.5rem;">¿Estás seguro?</h3>
-            <p style="color:#64748b; margin:0 0 30px 0; line-height:1.5;">Esta acción eliminará el registro permanentemente.</p>
-            <div class="modal-actions" style="justify-content:center;">
-                <button class="btn btn-cancel" onclick="delClose()">No, cancelar</button>
-                <button class="btn btn-delete" onclick="delConfirm()">Sí, eliminar</button>
-            </div>
+            <div style="width:80px; height:80px; background:#fef2f2; color:#ef4444; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 25px;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></div>
+            <h3 style="margin:0 0 10px 0; font-size:1.6rem;">¿Estás seguro?</h3>
+            <p style="color:#64748b; margin:0 0 30px 0; line-height:1.6;">Esta acción eliminará el registro permanentemente.</p>
+            <div class="modal-actions" style="justify-content:center;"><button class="btn btn-cancel" onclick="delClose()">No, cancelar</button><button class="btn btn-delete" onclick="delConfirm()">Sí, eliminar</button></div>
         </div>
     </div>
 
     <script>
-        // CONFIG
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
-
-        let db = [];
-        let editIdx = -1;
-        let filtro = "TODOS";
-        let deleteIdx = null;
+        let db = []; let editIdx = -1; let filtro = "TODOS"; let deleteIdx = null;
+        let currentLinks = [];
+        let searchTimeout = null;
 
         const el = {
-            loader: document.getElementById('loader'),
-            status: document.getElementById('statusEl'),
-            statusTxt: document.getElementById('statusTxt'),
-            searchWrap: document.getElementById('searchWrapper'),
-            search: document.getElementById('searchIn'),
-            clear: document.getElementById('clearBtn'),
-            chips: document.getElementById('chips'),
-            res: document.getElementById('results'),
-            modal: document.getElementById('modalMain'),
-            modalDel: document.getElementById('modalDel'),
-            toast: document.getElementById('toast'),
+            loader: document.getElementById('loader'), status: document.getElementById('statusEl'), statusTxt: document.getElementById('statusTxt'),
+            container: document.getElementById('mainContainer'),
+            searchWrap: document.getElementById('searchWrapper'), search: document.getElementById('searchIn'), clear: document.getElementById('clearBtn'),
+            chips: document.getElementById('chips'), res: document.getElementById('results'),
+            sidebar: document.getElementById('sidebar'), sidebarContent: document.getElementById('sidebarContent'),
+            // PREVIEW ELEMENTS
+            preview: document.getElementById('previewCard'), prevTitle: document.getElementById('prevTitle'), prevBadge: document.getElementById('prevBadge'), prevDesc: document.getElementById('prevDesc'),
+            
+            modal: document.getElementById('modalMain'), modalDel: document.getElementById('modalDel'), toast: document.getElementById('toast'),
             in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute') },
-            mTitle: document.getElementById('modalTitle'),
-            btnSave: document.getElementById('btnSave')
+            linkInput: document.getElementById('inLinkInput'), linkList: document.getElementById('activeLinksArea'), datalist: document.getElementById('allTitles'),
+            mTitle: document.getElementById('modalTitle'), btnSave: document.getElementById('btnSave')
         };
 
         window.onload = () => { el.search.focus(); init(); };
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 150) el.searchWrap.classList.add('docked');
-            else el.searchWrap.classList.remove('docked');
-        });
+        window.addEventListener('scroll', () => { if (window.scrollY > 150) el.searchWrap.classList.add('docked'); else el.searchWrap.classList.remove('docked'); });
 
         async function init() {
             const t = setTimeout(() => { if(!db.length) { setStatus(false, "Modo Local"); db=localLoad(); el.loader.classList.add('hidden'); render(); }}, 5000);
             try {
                 const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {headers:{'X-Master-Key':MASTER_KEY}});
                 if(!r.ok) throw new Error();
-                const d = await r.json();
-                db = Array.isArray(d.record) ? d.record : [];
-                setStatus(true, "Sincronizado");
-                clearTimeout(t);
+                const d = await r.json(); db = Array.isArray(d.record) ? d.record : []; setStatus(true, "Sincronizado"); clearTimeout(t);
             } catch(e) { setStatus(false, "Desconectado"); db = localLoad(); }
             render(); el.loader.classList.add('hidden');
         }
 
         function setStatus(ok, txt) { el.status.className = `status-pill ${ok?'active':'error'}`; el.statusTxt.innerText = txt; }
         function localLoad() { return JSON.parse(localStorage.getItem('typify_db')) || []; }
-        
         async function sync() {
-            el.loader.classList.remove('hidden');
-            localStorage.setItem('typify_db', JSON.stringify(db));
+            el.loader.classList.remove('hidden'); localStorage.setItem('typify_db', JSON.stringify(db));
             try {
                 const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY}, body:JSON.stringify(db) });
-                if(!r.ok) throw new Error();
-                setStatus(true, "Guardado"); toast("Cambios guardados");
-            } catch(e) { setStatus(false, "Error Guardado"); alert("Error al subir a la nube. Se guardó localmente."); }
+                if(!r.ok) throw new Error(); setStatus(true, "Guardado"); toast("Cambios guardados");
+            } catch(e) { setStatus(false, "Error Guardado"); alert("Error al subir. Se guardó localmente."); }
             el.loader.classList.add('hidden');
         }
 
         const colors = [{bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'}, {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'}, {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}];
         function getColor(s) { if(!s) return colors[0]; let h=0; for(let i=0;i<s.length;i++)h+=s.charCodeAt(i); return colors[h%colors.length]; }
 
-        function render() {
-            const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
-            const cats = ["TODOS", ...uniqueCats];
-            
-            el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
-
-            const q = el.search.value.toLowerCase();
-            const list = db.map((x,i)=>({...x,i})).filter(x => (filtro==="TODOS"||x.clasificacion===filtro) && (x.titulo.toLowerCase().includes(q)||x.descripcion.toLowerCase().includes(q)));
-            
-            if(!list.length) { el.res.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:50px;">Sin resultados</div>'; return; }
-
-            el.res.innerHTML = list.map(x => {
-                const c = getColor(x.clasificacion);
-                const rutaHTML = x.ruta ? `<div class="route">${x.ruta}</div>` : '';
-                
-                return `
-                <div class="card" style="animation-delay:${x.i*0.05}s">
-                    <div class="card-header">
-                        <div>
-                            ${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}
-                            <div class="card-title">${x.titulo}</div>
-                        </div>
-                        <div class="actions">
-                            <button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                            <button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                        </div>
-                    </div>
-                    <div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')">
-                        <div class="tooltip-copy">CLICK PARA COPIAR</div>
-                        <pre class="desc-text">${x.descripcion}</pre>
-                    </div>
-                    ${rutaHTML}
-                </div>`;
-            }).join('');
+        function createCard(x, i) {
+            const c = getColor(x.clasificacion); const rutaHTML = x.ruta ? `<div class="route"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> ${x.ruta}</div>` : ''; 
+            const hasLinks = x.links && x.links.length > 0;
+            const linkBadge = hasLinks ? `<span class="badge" style="background:#f1f5f9;color:#64748b;margin-left:5px;">🔗 ${x.links.length} Enlaces</span>` : '';
+            return `<div class="card" style="transition-delay:${i*0.1}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}</div>`;
         }
 
-        window.setFilter = c => { filtro = c; render(); };
-        function escapeHtml(text) { return text.replace(/'/g, "\\'"); }
-        window.copy = (txt) => { navigator.clipboard.writeText(txt); toast("¡Copiado!"); };
-        function toast(msg) { document.getElementById('toastMsg').innerText = msg; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
-        window.modalOpen = (idx=-1) => {
-            editIdx = idx; el.mTitle.innerText = idx===-1 ? "Nueva Tipificación" : "Editar Registro"; el.btnSave.innerText = idx===-1 ? "Crear" : "Guardar Cambios";
-            const d = idx===-1 ? {} : db[idx]; el.in.c.value = d.clasificacion||""; el.in.t.value = d.titulo||""; el.in.d.value = d.descripcion||""; el.in.r.value = d.ruta||"";
-            el.modal.classList.add('active'); setTimeout(()=>el.in.c.focus(), 100);
-        };
-        window.modalClose = () => el.modal.classList.remove('active');
-        window.saveData = async () => {
-            const obj = { clasificacion: el.in.c.value.trim().toUpperCase(), titulo: el.in.t.value.trim(), descripcion: el.in.d.value, ruta: el.in.r.value.trim() };
-            if(!obj.titulo) return alert("Falta el título");
-            editIdx===-1 ? db.unshift(obj) : db[editIdx] = obj; modalClose(); render(); await sync();
-        };
-        window.delAsk = (i) => { deleteIdx=i; el.modalDel.classList.add('active'); };
-        window.delClose = () => el.modalDel.classList.remove('active');
-        window.delConfirm = async () => { if(deleteIdx!==null){ db.splice(deleteIdx,1); delClose(); render(); await sync(); }};
+        /* --- SKELETON ALTO CONTRASTE --- */
+        function getSkeletonHTML() {
+            return `
+                <div class="skeleton-card">
+                    <div class="sk-line sk-w40"></div>
+                    <div class="sk-line sk-w20"></div>
+                    <div class="sk-line sk-block"></div>
+                </div>
+                <div class="skeleton-card" style="opacity:0.7">
+                    <div class="sk-line sk-w40"></div>
+                    <div class="sk-line sk-block"></div>
+                </div>
+            `;
+        }
 
-        el.search.addEventListener('input', e => { el.clear.classList.toggle('visible', e.target.value.length>0); render(); });
-        el.clear.onclick = () => { el.search.value=''; el.clear.classList.remove('visible'); el.search.focus(); render(); };
-        document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f') { e.preventDefault(); el.search.focus(); el.search.select(); } if(e.key==='Escape') { modalClose(); delClose(); if(document.activeElement===el.search) el.clear.click(); }});
+        function createMini(title) {
+            const item = db.find(d => d.titulo === title);
+            const clickAction = item ? `document.querySelector('.card:nth-child(${db.indexOf(item)+1})')?.scrollIntoView({behavior:'smooth'}) || filterByLink('${escapeHtml(title)}')` : '';
+            const hoverAction = `showPreview('${escapeHtml(title)}')`;
+            const leaveAction = `hidePreview()`;
+            return `
+            <div class="mini-card" onclick="${clickAction}" onmouseenter="${hoverAction}" onmouseleave="${leaveAction}">
+                <div class="mini-icon-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></div>
+                <div class="mini-content"><div class="mini-title">${title}</div></div>
+                <svg class="mini-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 18l6-6-6-6"/></svg>
+            </div>`;
+        }
+
+        window.showPreview = (title) => {
+            const item = db.find(x => x.titulo === title);
+            if(!item) return;
+            el.prevTitle.innerText = item.titulo;
+            el.prevBadge.innerText = item.clasificacion || "Sugerencia";
+            el.prevDesc.innerText = item.descripcion;
+            el.preview.classList.add('active');
+        };
+        window.hidePreview = () => { el.preview.classList.remove('active'); };
+
+        function render() {
+            const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
+            const cats = ["TODOS", ...uniqueCats]; el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
+            const q = el.search.value.toLowerCase();
+            const results = db.map((x,i)=>({...x,i})).filter(x => (filtro==="TODOS"||x.clasificacion===filtro) && (x.titulo.toLowerCase().includes(q)||x.descripcion.toLowerCase().includes(q)));
+            
+            if(!results.length) { el.res.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:50px;">Sin resultados</div>'; el.container.classList.remove('has-sidebar'); return; }
+            el.res.innerHTML = results.map(x => createCard(x, x.i)).join('');
+            requestAnimationFrame(() => { document.querySelectorAll('.card').forEach(c => c.classList.add('visible')); });
+
+            if (results.length > 0) {
+                const prime = results[0];
+                if (prime.links && Array.isArray(prime.links) && prime.links.length > 0) {
+                    el.sidebarContent.innerHTML = prime.links.map(linkTitle => createMini(linkTitle)).join('');
+                    el.container.classList.add('has-sidebar');
+                } else { el.container.classList.remove('has-sidebar'); }
+            } else { el.container.classList.remove('has-sidebar'); }
+        }
+
+        // --- LÓGICA DE BÚSQUEDA CON RETRASO ARTIFICIAL PARA UX ---
+        el.search.addEventListener('input', e => {
+            const val = e.target.value;
+            el.clear.classList.toggle('visible', val.length > 0);
+            
+            // 1. Mostrar Skeleton AL INSTANTE de escribir
+            el.res.innerHTML = getSkeletonHTML();
+            el.container.classList.remove('has-sidebar'); // Ocultar sidebar para evitar saltos
+
+            // 2. Debounce + Delay Artificial (500ms)
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { 
+                render(); 
+            }, 500); // 500ms de "pensamiento"
+        });
+
+        window.addLink = () => { const val = el.linkInput.value.trim(); if(val && !currentLinks.includes(val)) { currentLinks.push(val); renderLinksList(); el.linkInput.value = ''; }};
+        window.removeLink = (val) => { currentLinks = currentLinks.filter(l => l !== val); renderLinksList(); };
+        function renderLinksList() { el.linkList.innerHTML = currentLinks.map(l => `<span class="link-pill">${l} <span class="link-remove" onclick="removeLink('${l}')">✕</span></span>`).join(''); }
+        window.setFilter = c => { filtro = c; render(); }; window.filterByLink = t => { el.search.value = t; el.clear.classList.add('visible'); render(); };
+        function escapeHtml(t) { return t.replace(/'/g, "\\'"); } window.copy = t => { navigator.clipboard.writeText(t); toast("¡Copiado!"); };
+        function toast(m) { document.getElementById('toastMsg').innerText = m; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
+        window.modalOpen = (idx=-1) => { editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; const d=idx===-1?{}:db[idx]; el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||""; currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); el.modal.classList.add('active'); setTimeout(()=>el.in.c.focus(), 100); };
+        window.modalClose = () => el.modal.classList.remove('active');
+        window.saveData = async () => { const o = { clasificacion: el.in.c.value.trim().toUpperCase(), titulo: el.in.t.value.trim(), descripcion: el.in.d.value, ruta: el.in.r.value.trim(), links: currentLinks }; if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); };
+        window.delAsk = i => { deleteIdx=i; el.modalDel.classList.add('active'); }; window.delClose = () => el.modalDel.classList.remove('active'); window.delConfirm = async () => { if(deleteIdx!==null){ db.splice(deleteIdx,1); delClose(); render(); await sync(); }};
+        el.clear.onclick = () => { el.search.value=''; el.clear.classList.remove('visible'); el.search.focus(); render(); }; document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f') { e.preventDefault(); el.search.focus(); el.search.select(); } if(e.key==='Escape') { modalClose(); delClose(); if(document.activeElement===el.search) el.clear.click(); }});
     </script>
 </body>
 </html>
