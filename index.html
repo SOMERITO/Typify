@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Modal Scroll Fix)</title>
+    <title>Typify Pro (Instant Search)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v60.0 (Modal Scroll & Layout)
+           ESTILOS v61.0 (Instant Feedback & UX)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -69,11 +69,26 @@
         .mini-arrow { opacity: 0; transform: translateX(-10px); color: var(--primary); transition: 0.3s; }
         .mini-card:hover .mini-arrow { opacity: 1; transform: translateX(0); }
 
-        /* SKELETON */
-        .skeleton-card { background: rgba(255, 255, 255, 0.8); border-radius: 28px; padding: 35px; border: 1px solid rgba(203, 213, 225, 0.5); margin-bottom: 28px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); }
-        .sk-line { height: 20px; margin-bottom: 15px; border-radius: 12px; background: linear-gradient(to right, #cbd5e1 8%, #94a3b8 18%, #cbd5e1 33%); background-size: 800px 104px; animation: shimmer 1.2s infinite linear forwards; }
+        /* --- SKELETON MEJORADO (Carga Visible) --- */
+        .skeleton-container { animation: fadeIn 0.3s ease; }
+        .skeleton-text { color: var(--primary); font-weight: 700; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .skeleton-card { 
+            background: rgba(255, 255, 255, 0.9); /* Más opaco para que se vea bien */
+            border-radius: 28px; padding: 35px; 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            margin-bottom: 28px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+        }
+        .sk-line { 
+            height: 20px; margin-bottom: 15px; border-radius: 12px; 
+            background: linear-gradient(to right, #cbd5e1 8%, #94a3b8 18%, #cbd5e1 33%); 
+            background-size: 800px 104px; animation: shimmer 1s infinite linear forwards; 
+        }
         @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
         .sk-w40 { width: 40%; height: 28px; margin-bottom: 25px; } .sk-w20 { width: 20%; height: 16px; } .sk-block { width: 100%; height: 100px; margin-top: 20px; }
+
 
         /* PREVIEW GLASS */
         .preview-glass { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 700px; max-height: 85vh; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(40px); border: 1px solid white; border-radius: 32px; padding: 50px; z-index: 1500; opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.4); }
@@ -86,7 +101,7 @@
         .preview-body-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .preview-body { font-size: 1.25rem; color: #334155; line-height: 1.8; letter-spacing: 0.01em; white-space: pre-wrap; }
 
-        /* --- ESTILOS DE TARJETAS DE COLOR (SEMÁFORO) --- */
+        /* --- ESTILOS DE TARJETAS --- */
         #results { display: grid; gap: 28px; padding-bottom: 60px; }
         
         /* Base Card */
@@ -96,28 +111,21 @@
             border: 1px solid rgba(255, 255, 255, 0.6); 
             border-radius: 28px; padding: 35px; position: relative; overflow: hidden; 
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); 
-            transition: 0.4s; opacity: 0; transform: translateY(30px); 
+            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s; /* Optimizado */
+            opacity: 0; transform: translateY(30px); 
         }
 
-        /* 🟠 ESTADO: OBSERVACIÓN (NARANJA) */
-        .card.is-orange {
-            background: rgba(255, 247, 237, 0.9);
-            border: 2px solid #fdba74;
-        }
+        /* Colores de Estado */
+        .card.is-orange { background: rgba(255, 247, 237, 0.95); border: 2px solid #fdba74; }
         .card.is-orange .card-title { color: #9a3412; }
         .card.is-orange:hover { box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); }
 
-        /* 🔴 ESTADO: ERROR/NO USAR (ROJO) */
-        .card.is-red {
-            background: rgba(254, 242, 242, 0.95);
-            border: 2px solid #fca5a5;
-            opacity: 0.9;
-        }
+        .card.is-red { background: rgba(254, 242, 242, 0.95); border: 2px solid #fca5a5; opacity: 0.9; }
         .card.is-red .card-title { color: #991b1b; text-decoration: line-through; text-decoration-color: #fca5a5; }
         .card.is-red:hover { box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.25); opacity: 1; }
 
         .card.visible { opacity: 1; transform: translateY(0); }
-        .card:hover { transform: translateY(-8px) scale(1.005); box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.95); }
+        .card:hover { transform: translateY(-8px) scale(1.005); box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.98); }
         
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
         .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 10px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
@@ -141,32 +149,19 @@
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(60px); background: #0f172a; color: white; padding: 16px 35px; border-radius: 60px; font-weight: 700; opacity: 0; visibility: hidden; transition: 0.5s; z-index: 2500; display: flex; align-items: center; gap: 12px; }
         #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
         
-        /* OVERLAY Y MODAL (CORREGIDOS) */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2000; }
         .overlay.active { opacity: 1; visibility: visible; }
         
-        /* --- AQUÍ ESTÁ LA SOLUCIÓN DEL SCROLL DEL MODAL --- */
+        /* MODAL CON SCROLL Y LÍMITE */
         .modal { 
-            background: #fff; 
-            width: 90%; 
-            max-width: 550px;
-            /* Límite de altura para que nunca se salga de pantalla */
-            max-height: 90vh; 
-            /* Scroll interno automático si es muy alto */
-            overflow-y: auto; 
-            
-            padding: 40px; 
-            border-radius: 35px; 
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); 
-            transform: scale(0.9) translateY(20px); 
-            transition: 0.4s; 
-            position: relative;
+            background: #fff; width: 90%; max-width: 550px;
+            max-height: 90vh; overflow-y: auto; /* SCROLL FIX */
+            padding: 40px; border-radius: 35px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); 
+            transform: scale(0.9) translateY(20px); transition: 0.4s; position: relative;
         }
-        /* Scrollbar interna del modal (estilo bonito) */
         .modal::-webkit-scrollbar { width: 6px; }
         .modal::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .modal::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-        
         .overlay.active .modal { transform: scale(1) translateY(0); }
         
         .input-group { margin-bottom: 24px; }
@@ -174,7 +169,7 @@
         .input-field { width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #f1f5f9; font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; }
         .input-field:focus { border-color: var(--primary); background: white; outline: none; }
         
-        /* COLOR SELECTOR IN MODAL */
+        /* COLOR SELECTOR */
         .color-selector { display: flex; gap: 15px; margin-top: 10px; }
         .color-circle { width: 35px; height: 35px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
         .color-circle:hover { transform: scale(1.1); }
@@ -389,11 +384,18 @@
             if(x.status === "orange") colorClass = "is-orange";
             if(x.status === "red") colorClass = "is-red";
 
-            return `<div class="card ${colorClass}" style="transition-delay:${i*0.1}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}</div>`;
+            return `<div class="card ${colorClass}" style="transition-delay:${i*0.05}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}</div>`;
         }
 
+        /* --- SKELETON MEJORADO (CON TEXTO) --- */
         function getSkeletonHTML() {
-            return `<div class="skeleton-card"><div class="sk-line sk-w40"></div><div class="sk-line sk-w20"></div><div class="sk-line sk-block"></div></div><div class="skeleton-card" style="opacity:0.7"><div class="sk-line sk-w40"></div><div class="sk-line sk-block"></div></div>`;
+            return `
+            <div class="skeleton-container">
+                <div class="skeleton-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Buscando coincidencias...</div>
+                <div class="skeleton-card"><div class="sk-line sk-w40"></div><div class="sk-line sk-w20"></div><div class="sk-line sk-block"></div></div>
+                <div class="skeleton-card" style="opacity:0.8"><div class="sk-line sk-w40"></div><div class="sk-line sk-block"></div></div>
+                <div class="skeleton-card" style="opacity:0.6"><div class="sk-line sk-w40"></div><div class="sk-line sk-block"></div></div>
+            </div>`;
         }
 
         function createMini(title) {
@@ -442,12 +444,18 @@
         el.search.addEventListener('input', e => {
             const val = e.target.value;
             el.clear.classList.toggle('visible', val.length > 0);
+            
             if(val.length > 0) {
+                // FORCE SKELETON IMMEDIATELY
                 el.res.innerHTML = getSkeletonHTML();
                 el.container.classList.remove('has-sidebar'); 
+                
                 clearTimeout(searchTimeout);
+                // Reduce delay slightly for snappier feel, but enough to see loader
                 searchTimeout = setTimeout(() => { render(); }, 500); 
-            } else { render(); }
+            } else { 
+                render(); 
+            }
         });
 
         // --- MANEJO DE COLOR ---
