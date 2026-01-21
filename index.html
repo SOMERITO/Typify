@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Traffic Light)</title>
+    <title>Typify Pro (Fixed Layout)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v59.0 (Traffic Light System)
+           ESTILOS v59.1 (Visual Fix + Traffic Lights)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -101,17 +101,17 @@
 
         /* 🟠 ESTADO: OBSERVACIÓN (NARANJA) */
         .card.is-orange {
-            background: rgba(255, 247, 237, 0.9); /* Naranja muy suave */
-            border: 2px solid #fdba74; /* Borde Naranja */
+            background: rgba(255, 247, 237, 0.9);
+            border: 2px solid #fdba74;
         }
         .card.is-orange .card-title { color: #9a3412; }
         .card.is-orange:hover { box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); }
 
         /* 🔴 ESTADO: ERROR/NO USAR (ROJO) */
         .card.is-red {
-            background: rgba(254, 242, 242, 0.95); /* Rojo muy suave */
-            border: 2px solid #fca5a5; /* Borde Rojo */
-            opacity: 0.9; /* Un poco más apagado */
+            background: rgba(254, 242, 242, 0.95);
+            border: 2px solid #fca5a5;
+            opacity: 0.9;
         }
         .card.is-red .card-title { color: #991b1b; text-decoration: line-through; text-decoration-color: #fca5a5; }
         .card.is-red:hover { box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.25); opacity: 1; }
@@ -154,9 +154,7 @@
         .color-circle { width: 35px; height: 35px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
         .color-circle:hover { transform: scale(1.1); }
         .color-circle.selected { transform: scale(1.15); box-shadow: 0 0 0 3px var(--text-main); }
-        /* Checkmark trick */
         .color-circle.selected::after { content: '✓'; color: #475569; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; font-size: 1rem; }
-        
         .c-default { background: #f1f5f9; border: 1px solid #cbd5e1; }
         .c-orange { background: #fdba74; }
         .c-red { background: #fca5a5; }
@@ -180,7 +178,20 @@
         .loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 3000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
         .loader.hidden { opacity: 0; pointer-events: none; }
         
-        /* RESTO (Search, header, etc) ya incluidos en bloques anteriores, se mantienen igual */
+        /* BLOQUE RESTAURADO - LO QUE FALTABA */
+        .content-area { width: 100%; max-width: 800px; margin: 0 auto; transition: margin 0.5s ease; }
+        .main-container.has-sidebar .content-area { margin: 0; }
+        .header-section { grid-column: 1 / -1; text-align: center; margin-bottom: 40px; }
+        h1 { margin: 0 0 10px 0; font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 50%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .status-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-sec); background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.5); margin-bottom: 30px; }
+        .status-pill.active .dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+        
+        .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 35px; }
+        .chip { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.4); color: var(--text-sec); padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .chip:hover { background: white; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15); color: var(--primary); }
+        .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transform: scale(1.05); }
+
         .search-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; z-index: 100; transition: all 0.5s; }
         .search-wrapper.docked { position: fixed; top: 20px; right: 20px; width: 320px; margin: 0; z-index: 500; }
         .search-input { width: 100%; padding: 22px 60px; font-size: 1.2rem; border: none; border-radius: 30px; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); color: var(--text-main); font-family: inherit; font-weight: 600; box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15); transition: 0.3s; }
