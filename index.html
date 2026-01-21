@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Auditor Mode)</title>
+    <title>Typify Pro (High Contrast Path)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v62.0 (Auditor Mode & Side Notes)
+           ESTILOS v63.0 (High Contrast Path)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -69,7 +69,7 @@
         .mini-arrow { opacity: 0; transform: translateX(-10px); color: var(--primary); transition: 0.3s; }
         .mini-card:hover .mini-arrow { opacity: 1; transform: translateX(0); }
 
-        /* SKELETON (INSTANT FEEDBACK) */
+        /* SKELETON */
         .skeleton-container { animation: fadeIn 0.3s ease; }
         .skeleton-text { color: var(--primary); font-weight: 700; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; animation: pulseText 1.5s infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -89,83 +89,28 @@
         .preview-body-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .preview-body { font-size: 1.25rem; color: #334155; line-height: 1.8; letter-spacing: 0.01em; white-space: pre-wrap; }
 
-        /* --- ESTILOS DE TARJETAS Y OBSERVACIONES --- */
+        /* CARDS */
         #results { display: grid; gap: 28px; padding-bottom: 60px; }
+        .card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 28px; padding: 35px; position: relative; overflow: visible; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s; opacity: 0; transform: translateY(30px); }
         
-        .card { 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            border-radius: 28px; padding: 35px; 
-            position: relative; 
-            /* Importante para la burbuja lateral: Visible permite que salga del contenedor */
-            overflow: visible;  
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); 
-            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s;
-            opacity: 0; transform: translateY(30px); 
-        }
-
-        /* --- BURBUJA DE OBSERVACIÓN (SIDE BUBBLE) --- */
-        .obs-bubble {
-            position: absolute;
-            top: 20px;
-            left: 100%; /* A la derecha de la tarjeta */
-            margin-left: 15px;
-            width: 220px;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
-            font-size: 0.9rem;
-            font-weight: 600;
-            line-height: 1.5;
-            z-index: 50;
-            
-            /* Animación de entrada */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-10px);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
-        }
-
-        /* Flechita de la burbuja */
-        .obs-bubble::before {
-            content: ''; position: absolute; top: 20px; left: -8px;
-            width: 0; height: 0;
-            border-top: 8px solid transparent; border-bottom: 8px solid transparent;
-            border-right: 8px solid #ffffff;
-        }
-
-        /* Estilo Burbuja Naranja */
+        /* BUBBLE */
+        .obs-bubble { position: absolute; top: 20px; left: 100%; margin-left: 15px; width: 220px; background: #ffffff; border-radius: 16px; padding: 15px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); font-size: 0.9rem; font-weight: 600; line-height: 1.5; z-index: 50; opacity: 0; visibility: hidden; transform: translateX(-10px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+        .obs-bubble::before { content: ''; position: absolute; top: 20px; left: -8px; width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-right: 8px solid #ffffff; }
         .obs-bubble.is-obs-orange { border: 2px solid #fdba74; color: #c2410c; background: #fff7ed; }
-        .obs-bubble.is-obs-orange::before { border-right-color: #fdba74; } /* Truco para el borde de la flecha */
-
-        /* Estilo Burbuja Roja */
+        .obs-bubble.is-obs-orange::before { border-right-color: #fdba74; }
         .obs-bubble.is-obs-red { border: 2px solid #fca5a5; color: #b91c1c; background: #fef2f2; }
         .obs-bubble.is-obs-red::before { border-right-color: #fca5a5; }
-
-        /* Mostrar al Hover */
-        .card:hover .obs-bubble {
-            opacity: 1; visibility: visible; transform: translateX(0);
-        }
-
-        /* Ocultar burbuja en móviles para no romper diseño */
+        .card:hover .obs-bubble { opacity: 1; visibility: visible; transform: translateX(0); }
         @media (max-width: 1100px) { .obs-bubble { display: none; } }
 
-
-        /* ESTADOS DE TARJETA */
+        /* COLORS */
         .card.is-orange { background: rgba(255, 247, 237, 0.95); border: 2px solid #fdba74; }
         .card.is-orange .card-title { color: #9a3412; }
-        .card.is-orange:hover { box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); }
-
         .card.is-red { background: rgba(254, 242, 242, 0.95); border: 2px solid #fca5a5; opacity: 0.9; }
         .card.is-red .card-title { color: #991b1b; text-decoration: line-through; text-decoration-color: #fca5a5; }
-        .card.is-red:hover { box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.25); opacity: 1; }
-
         .card.visible { opacity: 1; transform: translateY(0); }
         .card:hover { transform: translateY(-8px) scale(1.005); box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.98); }
-        
+
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
         .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 10px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
         .card-title { font-size: 1.55rem; font-weight: 800; color: #0f172a; line-height: 1.3; letter-spacing: -0.01em; transition:0.3s;}
@@ -181,16 +126,30 @@
         .desc-text { font-size: 1.15rem; line-height: 1.85; color: var(--text-body); white-space: pre-wrap; pointer-events: none; margin: 0; letter-spacing: 0.015em; }
         .tooltip-copy { position: absolute; top: -14px; right: 25px; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 800; padding: 5px 15px; border-radius: 20px; opacity: 0; transform: translateY(15px); transition: 0.3s; pointer-events: none; }
         .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
-        .route { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #94a3b8; font-weight: 600; padding-left: 5px; display: flex; align-items: center; gap:8px;}
+        
+        /* --- ESTILOS DE RUTA ACTUALIZADOS (NEGRO) --- */
+        .route { 
+            font-family: 'Courier New', monospace; 
+            font-size: 0.9rem; 
+            color: #94a3b8; 
+            font-weight: 600; 
+            padding-left: 5px; 
+            margin-top: 10px;
+        }
+        .route-sep {
+            color: #000000; /* NEGRO PURO */
+            font-weight: 900;
+            margin: 0 4px;
+            font-size: 1.1em;
+        }
+        
         .fab { position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s; z-index: 90; }
         .fab:hover { transform: scale(1.15) rotate(90deg); background: var(--primary); }
-        
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(60px); background: #0f172a; color: white; padding: 16px 35px; border-radius: 60px; font-weight: 700; opacity: 0; visibility: hidden; transition: 0.5s; z-index: 2500; display: flex; align-items: center; gap: 12px; }
         #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
         
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2000; }
         .overlay.active { opacity: 1; visibility: visible; }
-        
         .modal { background: #fff; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; padding: 40px; border-radius: 35px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); transform: scale(0.9) translateY(20px); transition: 0.4s; position: relative; }
         .modal::-webkit-scrollbar { width: 6px; }
         .modal::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -412,33 +371,25 @@
 
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
-            const rutaHTML = x.ruta ? `<div class="route">${x.ruta}</div>` : ''; 
+            // CORRECCIÓN: Procesar la ruta para colorear el '>'
+            const rawRuta = x.ruta || "";
+            const formattedRuta = rawRuta.replace(/>/g, '<span class="route-sep">></span>');
+            const rutaHTML = x.ruta ? `<div class="route">${formattedRuta}</div>` : ''; 
+            
             const hasLinks = x.links && x.links.length > 0;
             const linkBadge = hasLinks ? `<span class="badge" style="background:#f1f5f9;color:#64748b;margin-left:5px;">🔗 ${x.links.length} Enlaces</span>` : '';
             
-            // APLICAR CLASES DE COLOR Y OBSERVACIÓN
             let colorClass = "";
             let obsClass = "";
             let obsHTML = "";
 
-            if(x.status === "orange") {
-                colorClass = "is-orange";
-                obsClass = "is-obs-orange";
-            }
-            if(x.status === "red") {
-                colorClass = "is-red";
-                obsClass = "is-obs-red";
-            }
-
-            // CREAR BURBUJA SI HAY STATUS Y OBSERVACIÓN
-            if(x.status && x.status !== 'default' && x.observacion) {
-                obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`;
-            }
+            if(x.status === "orange") { colorClass = "is-orange"; obsClass = "is-obs-orange"; }
+            if(x.status === "red") { colorClass = "is-red"; obsClass = "is-obs-red"; }
+            if(x.status && x.status !== 'default' && x.observacion) { obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`; }
 
             return `<div class="card ${colorClass}" style="transition-delay:${i*0.05}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}${obsHTML}</div>`;
         }
 
-        /* --- SKELETON MEJORADO (CON TEXTO) --- */
         function getSkeletonHTML() {
             return `
             <div class="skeleton-container">
@@ -495,17 +446,12 @@
         el.search.addEventListener('input', e => {
             const val = e.target.value;
             el.clear.classList.toggle('visible', val.length > 0);
-            
             if(val.length > 0) {
-                // FORCE SKELETON IMMEDIATELY
                 el.res.innerHTML = getSkeletonHTML();
                 el.container.classList.remove('has-sidebar'); 
-                
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => { render(); }, 500); 
-            } else { 
-                render(); 
-            }
+            } else { render(); }
         });
 
         // --- MANEJO DE COLOR ---
@@ -531,14 +477,10 @@
             el.in.t.value=d.titulo||""; 
             el.in.d.value=d.descripcion||""; 
             el.in.r.value=d.ruta||"";
-            el.in.o.value=d.observacion||""; // Cargar observación
-
+            el.in.o.value=d.observacion||""; 
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
             el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); 
-            
-            // Set Color
             selectColor(d.status || 'default');
-
             el.modal.classList.add('active'); setTimeout(()=>el.in.c.focus(), 100); 
         };
         
@@ -551,7 +493,7 @@
                 ruta: el.in.r.value.trim(), 
                 links: currentLinks,
                 status: tempColor,
-                observacion: el.in.o.value.trim() // Guardar observación
+                observacion: el.in.o.value.trim() 
             }; 
             if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); 
         };
