@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (High Contrast Path)</title>
+    <title>Typify Pro (Status Filters)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v63.0 (High Contrast Path)
+           ESTILOS v64.0 (Status Filters & Counters)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -127,21 +127,8 @@
         .tooltip-copy { position: absolute; top: -14px; right: 25px; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 800; padding: 5px 15px; border-radius: 20px; opacity: 0; transform: translateY(15px); transition: 0.3s; pointer-events: none; }
         .desc-box:hover .tooltip-copy { opacity: 1; transform: translateY(0); }
         
-        /* --- ESTILOS DE RUTA ACTUALIZADOS (NEGRO) --- */
-        .route { 
-            font-family: 'Courier New', monospace; 
-            font-size: 0.9rem; 
-            color: #94a3b8; 
-            font-weight: 600; 
-            padding-left: 5px; 
-            margin-top: 10px;
-        }
-        .route-sep {
-            color: #000000; /* NEGRO PURO */
-            font-weight: 900;
-            margin: 0 4px;
-            font-size: 1.1em;
-        }
+        .route { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #94a3b8; font-weight: 600; padding-left: 5px; margin-top: 10px; }
+        .route-sep { color: #000000; font-weight: 900; margin: 0 4px; font-size: 1.1em; }
         
         .fab { position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s; z-index: 90; }
         .fab:hover { transform: scale(1.15) rotate(90deg); background: var(--primary); }
@@ -197,7 +184,28 @@
         .status-pill.active .dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
         
-        .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 35px; }
+        /* --- STATUS FILTER BAR --- */
+        .status-filters { display: flex; gap: 10px; justify-content: center; margin-top: 25px; margin-bottom: 10px; }
+        .btn-filter-status { 
+            border: 1px solid transparent; 
+            border-radius: 12px; 
+            padding: 8px 16px; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.6);
+            color: var(--text-sec);
+        }
+        .btn-filter-status:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        /* Active States */
+        .btn-filter-status.active.all { background: #f1f5f9; color: var(--text-main); border-color: #cbd5e1; }
+        .btn-filter-status.active.orange { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
+        .btn-filter-status.active.red { background: #fef2f2; color: #b91c1c; border-color: #fca5a5; }
+
+        .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         .chip { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.4); color: var(--text-sec); padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .chip:hover { background: white; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15); color: var(--primary); }
         .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transform: scale(1.05); }
@@ -244,6 +252,9 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
+
+            <div id="statusFilters" class="status-filters"></div>
+            
             <div id="chips" class="chips-container"></div>
         </div>
 
@@ -323,12 +334,15 @@
         let currentLinks = [];
         let searchTimeout = null;
         let tempColor = 'default';
+        let statusFilter = 'ALL'; // Nuevo estado para filtro de colores
 
         const el = {
             loader: document.getElementById('loader'), status: document.getElementById('statusEl'), statusTxt: document.getElementById('statusTxt'),
             container: document.getElementById('mainContainer'),
             searchWrap: document.getElementById('searchWrapper'), search: document.getElementById('searchIn'), clear: document.getElementById('clearBtn'),
-            chips: document.getElementById('chips'), res: document.getElementById('results'),
+            chips: document.getElementById('chips'), 
+            statusFilters: document.getElementById('statusFilters'), // Nuevo container
+            res: document.getElementById('results'),
             sidebar: document.getElementById('sidebar'), sidebarContent: document.getElementById('sidebarContent'),
             // PREVIEW ELEMENTS
             preview: document.getElementById('previewCard'), prevTitle: document.getElementById('prevTitle'), prevBadge: document.getElementById('prevBadge'), prevDesc: document.getElementById('prevDesc'),
@@ -371,7 +385,6 @@
 
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
-            // CORRECCIÓN: Procesar la ruta para colorear el '>'
             const rawRuta = x.ruta || "";
             const formattedRuta = rawRuta.replace(/>/g, '<span class="route-sep">></span>');
             const rutaHTML = x.ruta ? `<div class="route">${formattedRuta}</div>` : ''; 
@@ -424,16 +437,41 @@
         window.hidePreview = () => { el.preview.classList.remove('active'); };
 
         function render() {
+            // 1. Render Categories Chips
             const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
-            const cats = ["TODOS", ...uniqueCats]; el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
+            const cats = ["TODOS", ...uniqueCats]; 
+            el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
+            
+            // 2. Render Status Filter Buttons (New)
+            const countOrange = db.filter(x => x.status === 'orange').length;
+            const countRed = db.filter(x => x.status === 'red').length;
+            
+            el.statusFilters.innerHTML = `
+                <button class="btn-filter-status all ${statusFilter==='ALL'?'active':''}" onclick="setStatusFilter('ALL')">
+                    ⚪ Todo
+                </button>
+                <button class="btn-filter-status orange ${statusFilter==='orange'?'active':''}" onclick="setStatusFilter('orange')">
+                    🟠 Observaciones ${countOrange>0?`(${countOrange})`:''}
+                </button>
+                <button class="btn-filter-status red ${statusFilter==='red'?'active':''}" onclick="setStatusFilter('red')">
+                    🔴 Errores ${countRed>0?`(${countRed})`:''}
+                </button>
+            `;
+
+            // 3. Filter Results
             const q = el.search.value.toLowerCase();
-            const results = db.map((x,i)=>({...x,i})).filter(x => (filtro==="TODOS"||x.clasificacion===filtro) && (x.titulo.toLowerCase().includes(q)||x.descripcion.toLowerCase().includes(q)));
+            const results = db.map((x,i)=>({...x,i})).filter(x => {
+                const matchSearch = x.titulo.toLowerCase().includes(q) || x.descripcion.toLowerCase().includes(q);
+                const matchCat = filtro === "TODOS" || x.clasificacion === filtro;
+                const matchStatus = statusFilter === "ALL" || x.status === statusFilter;
+                return matchSearch && matchCat && matchStatus;
+            });
             
             if(!results.length) { el.res.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:50px;">Sin resultados</div>'; el.container.classList.remove('has-sidebar'); return; }
             el.res.innerHTML = results.map(x => createCard(x, x.i)).join('');
             requestAnimationFrame(() => { document.querySelectorAll('.card').forEach(c => c.classList.add('visible')); });
 
-            const isSearching = q.length > 0 || filtro !== "TODOS";
+            const isSearching = q.length > 0 || filtro !== "TODOS" || statusFilter !== "ALL";
             if (results.length > 0 && isSearching) {
                 const prime = results[0];
                 if (prime.links && Array.isArray(prime.links) && prime.links.length > 0) {
@@ -446,6 +484,7 @@
         el.search.addEventListener('input', e => {
             const val = e.target.value;
             el.clear.classList.toggle('visible', val.length > 0);
+            
             if(val.length > 0) {
                 el.res.innerHTML = getSkeletonHTML();
                 el.container.classList.remove('has-sidebar'); 
@@ -453,6 +492,11 @@
                 searchTimeout = setTimeout(() => { render(); }, 500); 
             } else { render(); }
         });
+
+        // --- FILTER LOGIC ---
+        window.setFilter = c => { filtro = c; render(); }; 
+        window.setStatusFilter = s => { statusFilter = s; render(); };
+        window.filterByLink = t => { el.search.value = t; el.clear.classList.add('visible'); render(); };
 
         // --- MANEJO DE COLOR ---
         window.selectColor = (c) => {
@@ -466,7 +510,7 @@
         window.addLink = () => { const val = el.linkInput.value.trim(); if(val && !currentLinks.includes(val)) { currentLinks.push(val); renderLinksList(); el.linkInput.value = ''; }};
         window.removeLink = (val) => { currentLinks = currentLinks.filter(l => l !== val); renderLinksList(); };
         function renderLinksList() { el.linkList.innerHTML = currentLinks.map(l => `<span class="link-pill">${l} <span class="link-remove" onclick="removeLink('${l}')">✕</span></span>`).join(''); }
-        window.setFilter = c => { filtro = c; render(); }; window.filterByLink = t => { el.search.value = t; el.clear.classList.add('visible'); render(); };
+        
         function escapeHtml(t) { return t.replace(/'/g, "\\'"); } window.copy = t => { navigator.clipboard.writeText(t); toast("¡Copiado!"); };
         function toast(m) { document.getElementById('toastMsg').innerText = m; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
         
