@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Instant Search)</title>
+    <title>Typify Pro (Auditor Mode)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v61.0 (Instant Feedback & UX)
+           ESTILOS v62.0 (Auditor Mode & Side Notes)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -69,26 +69,14 @@
         .mini-arrow { opacity: 0; transform: translateX(-10px); color: var(--primary); transition: 0.3s; }
         .mini-card:hover .mini-arrow { opacity: 1; transform: translateX(0); }
 
-        /* --- SKELETON MEJORADO (Carga Visible) --- */
+        /* SKELETON (INSTANT FEEDBACK) */
         .skeleton-container { animation: fadeIn 0.3s ease; }
         .skeleton-text { color: var(--primary); font-weight: 700; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; animation: pulseText 1.5s infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        .skeleton-card { 
-            background: rgba(255, 255, 255, 0.9); /* Más opaco para que se vea bien */
-            border-radius: 28px; padding: 35px; 
-            border: 1px solid rgba(255, 255, 255, 0.8); 
-            margin-bottom: 28px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-        }
-        .sk-line { 
-            height: 20px; margin-bottom: 15px; border-radius: 12px; 
-            background: linear-gradient(to right, #cbd5e1 8%, #94a3b8 18%, #cbd5e1 33%); 
-            background-size: 800px 104px; animation: shimmer 1s infinite linear forwards; 
-        }
+        .skeleton-card { background: rgba(255, 255, 255, 0.9); border-radius: 28px; padding: 35px; border: 1px solid rgba(255, 255, 255, 0.8); margin-bottom: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .sk-line { height: 20px; margin-bottom: 15px; border-radius: 12px; background: linear-gradient(to right, #cbd5e1 8%, #94a3b8 18%, #cbd5e1 33%); background-size: 800px 104px; animation: shimmer 1s infinite linear forwards; }
         @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
         .sk-w40 { width: 40%; height: 28px; margin-bottom: 25px; } .sk-w20 { width: 20%; height: 16px; } .sk-block { width: 100%; height: 100px; margin-top: 20px; }
-
 
         /* PREVIEW GLASS */
         .preview-glass { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 700px; max-height: 85vh; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(40px); border: 1px solid white; border-radius: 32px; padding: 50px; z-index: 1500; opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.4); }
@@ -101,21 +89,72 @@
         .preview-body-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .preview-body { font-size: 1.25rem; color: #334155; line-height: 1.8; letter-spacing: 0.01em; white-space: pre-wrap; }
 
-        /* --- ESTILOS DE TARJETAS --- */
+        /* --- ESTILOS DE TARJETAS Y OBSERVACIONES --- */
         #results { display: grid; gap: 28px; padding-bottom: 60px; }
         
-        /* Base Card */
         .card { 
             background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
-            border-radius: 28px; padding: 35px; position: relative; overflow: hidden; 
+            border-radius: 28px; padding: 35px; 
+            position: relative; 
+            /* Importante para la burbuja lateral: Visible permite que salga del contenedor */
+            overflow: visible;  
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); 
-            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s; /* Optimizado */
+            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s;
             opacity: 0; transform: translateY(30px); 
         }
 
-        /* Colores de Estado */
+        /* --- BURBUJA DE OBSERVACIÓN (SIDE BUBBLE) --- */
+        .obs-bubble {
+            position: absolute;
+            top: 20px;
+            left: 100%; /* A la derecha de la tarjeta */
+            margin-left: 15px;
+            width: 220px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.5;
+            z-index: 50;
+            
+            /* Animación de entrada */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        /* Flechita de la burbuja */
+        .obs-bubble::before {
+            content: ''; position: absolute; top: 20px; left: -8px;
+            width: 0; height: 0;
+            border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+            border-right: 8px solid #ffffff;
+        }
+
+        /* Estilo Burbuja Naranja */
+        .obs-bubble.is-obs-orange { border: 2px solid #fdba74; color: #c2410c; background: #fff7ed; }
+        .obs-bubble.is-obs-orange::before { border-right-color: #fdba74; } /* Truco para el borde de la flecha */
+
+        /* Estilo Burbuja Roja */
+        .obs-bubble.is-obs-red { border: 2px solid #fca5a5; color: #b91c1c; background: #fef2f2; }
+        .obs-bubble.is-obs-red::before { border-right-color: #fca5a5; }
+
+        /* Mostrar al Hover */
+        .card:hover .obs-bubble {
+            opacity: 1; visibility: visible; transform: translateX(0);
+        }
+
+        /* Ocultar burbuja en móviles para no romper diseño */
+        @media (max-width: 1100px) { .obs-bubble { display: none; } }
+
+
+        /* ESTADOS DE TARJETA */
         .card.is-orange { background: rgba(255, 247, 237, 0.95); border: 2px solid #fdba74; }
         .card.is-orange .card-title { color: #9a3412; }
         .card.is-orange:hover { box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); }
@@ -152,13 +191,7 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.4s; z-index: 2000; }
         .overlay.active { opacity: 1; visibility: visible; }
         
-        /* MODAL CON SCROLL Y LÍMITE */
-        .modal { 
-            background: #fff; width: 90%; max-width: 550px;
-            max-height: 90vh; overflow-y: auto; /* SCROLL FIX */
-            padding: 40px; border-radius: 35px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); 
-            transform: scale(0.9) translateY(20px); transition: 0.4s; position: relative;
-        }
+        .modal { background: #fff; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; padding: 40px; border-radius: 35px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.3); transform: scale(0.9) translateY(20px); transition: 0.4s; position: relative; }
         .modal::-webkit-scrollbar { width: 6px; }
         .modal::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .modal::-webkit-scrollbar-thumb:hover { background: var(--primary); }
@@ -169,7 +202,6 @@
         .input-field { width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #f1f5f9; font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.2s; box-sizing: border-box; }
         .input-field:focus { border-color: var(--primary); background: white; outline: none; }
         
-        /* COLOR SELECTOR */
         .color-selector { display: flex; gap: 15px; margin-top: 10px; }
         .color-circle { width: 35px; height: 35px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
         .color-circle:hover { transform: scale(1.1); }
@@ -295,6 +327,11 @@
                 </div>
             </div>
 
+            <div class="input-group">
+                <label class="input-label">¿Por qué este color? (Opcional)</label>
+                <input id="inObs" class="input-field" placeholder="Ej: Falta actualizar el script, error ortográfico...">
+            </div>
+
             <div class="input-group"><label class="input-label">Ruta / Sistema</label><input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación"></div>
             
             <div class="input-group">
@@ -338,7 +375,7 @@
             preview: document.getElementById('previewCard'), prevTitle: document.getElementById('prevTitle'), prevBadge: document.getElementById('prevBadge'), prevDesc: document.getElementById('prevDesc'),
             
             modal: document.getElementById('modalMain'), modalDel: document.getElementById('modalDel'), toast: document.getElementById('toast'),
-            in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute') },
+            in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute'), o: document.getElementById('inObs') },
             // COLOR ELEMENTS
             cDef: document.getElementById('cDef'), cOrg: document.getElementById('cOrg'), cRed: document.getElementById('cRed'),
 
@@ -379,12 +416,26 @@
             const hasLinks = x.links && x.links.length > 0;
             const linkBadge = hasLinks ? `<span class="badge" style="background:#f1f5f9;color:#64748b;margin-left:5px;">🔗 ${x.links.length} Enlaces</span>` : '';
             
-            // APLICAR CLASES DE COLOR
+            // APLICAR CLASES DE COLOR Y OBSERVACIÓN
             let colorClass = "";
-            if(x.status === "orange") colorClass = "is-orange";
-            if(x.status === "red") colorClass = "is-red";
+            let obsClass = "";
+            let obsHTML = "";
 
-            return `<div class="card ${colorClass}" style="transition-delay:${i*0.05}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}</div>`;
+            if(x.status === "orange") {
+                colorClass = "is-orange";
+                obsClass = "is-obs-orange";
+            }
+            if(x.status === "red") {
+                colorClass = "is-red";
+                obsClass = "is-obs-red";
+            }
+
+            // CREAR BURBUJA SI HAY STATUS Y OBSERVACIÓN
+            if(x.status && x.status !== 'default' && x.observacion) {
+                obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`;
+            }
+
+            return `<div class="card ${colorClass}" style="transition-delay:${i*0.05}s"><div class="card-header"><div>${x.clasificacion?`<span class="badge" style="background:${c.bg};color:${c.t}">${x.clasificacion}</span>`:''}${linkBadge}<div class="card-title">${x.titulo}</div></div><div class="actions"><button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div><div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')"><div class="tooltip-copy">CLICK PARA COPIAR</div><pre class="desc-text">${x.descripcion}</pre></div>${rutaHTML}${obsHTML}</div>`;
         }
 
         /* --- SKELETON MEJORADO (CON TEXTO) --- */
@@ -451,7 +502,6 @@
                 el.container.classList.remove('has-sidebar'); 
                 
                 clearTimeout(searchTimeout);
-                // Reduce delay slightly for snappier feel, but enough to see loader
                 searchTimeout = setTimeout(() => { render(); }, 500); 
             } else { 
                 render(); 
@@ -476,7 +526,13 @@
         
         window.modalOpen = (idx=-1) => { 
             editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; 
-            const d=idx===-1?{}:db[idx]; el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||"";
+            const d=idx===-1?{}:db[idx]; 
+            el.in.c.value=d.clasificacion||""; 
+            el.in.t.value=d.titulo||""; 
+            el.in.d.value=d.descripcion||""; 
+            el.in.r.value=d.ruta||"";
+            el.in.o.value=d.observacion||""; // Cargar observación
+
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
             el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); 
             
@@ -494,7 +550,8 @@
                 descripcion: el.in.d.value, 
                 ruta: el.in.r.value.trim(), 
                 links: currentLinks,
-                status: tempColor // Guardamos el color seleccionado
+                status: tempColor,
+                observacion: el.in.o.value.trim() // Guardar observación
             }; 
             if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); 
         };
