@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Status Filters)</title>
+    <title>Typify Pro (Juicy Filters)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v64.0 (Status Filters & Counters)
+           ESTILOS v65.0 (Juicy Buttons & Animations)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -184,26 +184,36 @@
         .status-pill.active .dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
         
-        /* --- STATUS FILTER BAR --- */
-        .status-filters { display: flex; gap: 10px; justify-content: center; margin-top: 25px; margin-bottom: 10px; }
+        /* --- STATUS FILTER BAR (JUICY STYLE) --- */
+        .status-filters { display: flex; gap: 12px; justify-content: center; margin-top: 30px; margin-bottom: 15px; }
         .btn-filter-status { 
-            border: 1px solid transparent; 
-            border-radius: 12px; 
-            padding: 8px 16px; 
-            font-size: 0.85rem; 
+            border: none;
+            border-radius: 30px; /* Pill shape */
+            padding: 10px 22px; 
+            font-size: 0.9rem; 
             font-weight: 700; 
             cursor: pointer; 
-            transition: 0.2s; 
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.6);
+            display: flex; align-items: center; gap: 8px;
             color: var(--text-sec);
+            background: linear-gradient(to bottom right, #ffffff, #f1f5f9); /* Subtle gradient base */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Bouncy transition */
         }
-        .btn-filter-status:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-filter-status .emoji { display: inline-block; transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Hover Animation */
+        .btn-filter-status:hover { 
+            transform: translateY(-4px) scale(1.02); /* Higher lift & grow */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Deeper shadow */
+            color: var(--primary);
+        }
+        .btn-filter-status:hover .emoji { transform: scale(1.2) rotate(10deg); /* Pop & rotate emoji */ }
         
-        /* Active States */
-        .btn-filter-status.active.all { background: #f1f5f9; color: var(--text-main); border-color: #cbd5e1; }
-        .btn-filter-status.active.orange { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
-        .btn-filter-status.active.red { background: #fef2f2; color: #b91c1c; border-color: #fca5a5; }
+        /* Active States - Vibrant & Juicy */
+        .btn-filter-status.active { transform: translateY(0) scale(1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Pressed look */ }
+        .btn-filter-status.active.all { background: linear-gradient(135deg, var(--text-main), var(--primary)); color: white; }
+        .btn-filter-status.active.orange { background: linear-gradient(135deg, #f97316, #fbbf24); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .btn-filter-status.active.red { background: linear-gradient(135deg, #dc2626, #f87171); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
         .chips-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         .chip { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.4); color: var(--text-sec); padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
@@ -334,24 +344,20 @@
         let currentLinks = [];
         let searchTimeout = null;
         let tempColor = 'default';
-        let statusFilter = 'ALL'; // Nuevo estado para filtro de colores
+        let statusFilter = 'ALL';
 
         const el = {
             loader: document.getElementById('loader'), status: document.getElementById('statusEl'), statusTxt: document.getElementById('statusTxt'),
             container: document.getElementById('mainContainer'),
             searchWrap: document.getElementById('searchWrapper'), search: document.getElementById('searchIn'), clear: document.getElementById('clearBtn'),
             chips: document.getElementById('chips'), 
-            statusFilters: document.getElementById('statusFilters'), // Nuevo container
+            statusFilters: document.getElementById('statusFilters'),
             res: document.getElementById('results'),
             sidebar: document.getElementById('sidebar'), sidebarContent: document.getElementById('sidebarContent'),
-            // PREVIEW ELEMENTS
             preview: document.getElementById('previewCard'), prevTitle: document.getElementById('prevTitle'), prevBadge: document.getElementById('prevBadge'), prevDesc: document.getElementById('prevDesc'),
-            
             modal: document.getElementById('modalMain'), modalDel: document.getElementById('modalDel'), toast: document.getElementById('toast'),
             in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute'), o: document.getElementById('inObs') },
-            // COLOR ELEMENTS
             cDef: document.getElementById('cDef'), cOrg: document.getElementById('cOrg'), cRed: document.getElementById('cRed'),
-
             linkInput: document.getElementById('inLinkInput'), linkList: document.getElementById('activeLinksArea'), datalist: document.getElementById('allTitles'),
             mTitle: document.getElementById('modalTitle'), btnSave: document.getElementById('btnSave')
         };
@@ -392,10 +398,7 @@
             const hasLinks = x.links && x.links.length > 0;
             const linkBadge = hasLinks ? `<span class="badge" style="background:#f1f5f9;color:#64748b;margin-left:5px;">🔗 ${x.links.length} Enlaces</span>` : '';
             
-            let colorClass = "";
-            let obsClass = "";
-            let obsHTML = "";
-
+            let colorClass = ""; let obsClass = ""; let obsHTML = "";
             if(x.status === "orange") { colorClass = "is-orange"; obsClass = "is-obs-orange"; }
             if(x.status === "red") { colorClass = "is-red"; obsClass = "is-obs-red"; }
             if(x.status && x.status !== 'default' && x.observacion) { obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`; }
@@ -437,28 +440,25 @@
         window.hidePreview = () => { el.preview.classList.remove('active'); };
 
         function render() {
-            // 1. Render Categories Chips
             const uniqueCats = [...new Set(db.map(x=>x.clasificacion).filter(Boolean))].sort();
             const cats = ["TODOS", ...uniqueCats]; 
             el.chips.innerHTML = cats.map(c => `<button class="chip ${filtro===c?'active':''}" onclick="setFilter('${c}')">${c==="TODOS"?"Todos":c}</button>`).join('');
             
-            // 2. Render Status Filter Buttons (New)
             const countOrange = db.filter(x => x.status === 'orange').length;
             const countRed = db.filter(x => x.status === 'red').length;
             
             el.statusFilters.innerHTML = `
                 <button class="btn-filter-status all ${statusFilter==='ALL'?'active':''}" onclick="setStatusFilter('ALL')">
-                    ⚪ Todo
+                    <span class="emoji">⚪</span> Todo
                 </button>
                 <button class="btn-filter-status orange ${statusFilter==='orange'?'active':''}" onclick="setStatusFilter('orange')">
-                    🟠 Observaciones ${countOrange>0?`(${countOrange})`:''}
+                    <span class="emoji">🟠</span> Observaciones ${countOrange>0?`(${countOrange})`:''}
                 </button>
                 <button class="btn-filter-status red ${statusFilter==='red'?'active':''}" onclick="setStatusFilter('red')">
-                    🔴 Errores ${countRed>0?`(${countRed})`:''}
+                    <span class="emoji">🔴</span> Errores ${countRed>0?`(${countRed})`:''}
                 </button>
             `;
 
-            // 3. Filter Results
             const q = el.search.value.toLowerCase();
             const results = db.map((x,i)=>({...x,i})).filter(x => {
                 const matchSearch = x.titulo.toLowerCase().includes(q) || x.descripcion.toLowerCase().includes(q);
@@ -484,7 +484,6 @@
         el.search.addEventListener('input', e => {
             const val = e.target.value;
             el.clear.classList.toggle('visible', val.length > 0);
-            
             if(val.length > 0) {
                 el.res.innerHTML = getSkeletonHTML();
                 el.container.classList.remove('has-sidebar'); 
@@ -493,12 +492,10 @@
             } else { render(); }
         });
 
-        // --- FILTER LOGIC ---
         window.setFilter = c => { filtro = c; render(); }; 
         window.setStatusFilter = s => { statusFilter = s; render(); };
         window.filterByLink = t => { el.search.value = t; el.clear.classList.add('visible'); render(); };
 
-        // --- MANEJO DE COLOR ---
         window.selectColor = (c) => {
             tempColor = c;
             [el.cDef, el.cOrg, el.cRed].forEach(div => div.classList.remove('selected'));
@@ -517,11 +514,7 @@
         window.modalOpen = (idx=-1) => { 
             editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; 
             const d=idx===-1?{}:db[idx]; 
-            el.in.c.value=d.clasificacion||""; 
-            el.in.t.value=d.titulo||""; 
-            el.in.d.value=d.descripcion||""; 
-            el.in.r.value=d.ruta||"";
-            el.in.o.value=d.observacion||""; 
+            el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||""; el.in.o.value=d.observacion||""; 
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
             el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); 
             selectColor(d.status || 'default');
@@ -530,15 +523,7 @@
         
         window.modalClose = () => el.modal.classList.remove('active');
         window.saveData = async () => { 
-            const o = { 
-                clasificacion: el.in.c.value.trim().toUpperCase(), 
-                titulo: el.in.t.value.trim(), 
-                descripcion: el.in.d.value, 
-                ruta: el.in.r.value.trim(), 
-                links: currentLinks,
-                status: tempColor,
-                observacion: el.in.o.value.trim() 
-            }; 
+            const o = { clasificacion: el.in.c.value.trim().toUpperCase(), titulo: el.in.t.value.trim(), descripcion: el.in.d.value, ruta: el.in.r.value.trim(), links: currentLinks, status: tempColor, observacion: el.in.o.value.trim() }; 
             if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); 
         };
         window.delAsk = i => { deleteIdx=i; el.modalDel.classList.add('active'); }; window.delClose = () => el.modalDel.classList.remove('active'); window.delConfirm = async () => { if(deleteIdx!==null){ db.splice(deleteIdx,1); delClose(); render(); await sync(); }};
