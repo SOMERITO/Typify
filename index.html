@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Stable Motion)</title>
+    <title>Typify Pro (Smart Search)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v67.0 (Stable & Smooth)
+           ESTILOS v68.0 (Smart Search & Stable Motion)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -132,13 +132,11 @@
         .chip:hover { background: white; transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); color: var(--primary); }
         .chip.active { background: var(--text-main); color: white; border-color: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transform: scale(1.15) rotate(-2deg); }
 
-        /* --- CARDS (SOLUCIÓN AL ENCOGIMIENTO) --- */
+        /* --- CARDS (ESTABLE) --- */
         #results { display: grid; gap: 30px; padding-bottom: 60px; }
         
-        /* Contenedor Principal de la Tarjeta */
         .card { 
             position: relative; 
-            /* Importante: Visible para que la burbuja salga */
             overflow: visible; 
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
             opacity: 0; transform: translateY(30px);
@@ -147,7 +145,6 @@
 
         .card.visible { opacity: 1; transform: translateY(0); }
 
-        /* Wrapper Interno: Aquí ocurre el "Shine" y el fondo */
         .card-shine-wrapper {
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
@@ -157,18 +154,13 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* SHINE EFFECT */
         .card-shine-wrapper::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
             transform: skewX(-25deg); transition: 0s; pointer-events: none; z-index: 10;
         }
 
-        /* HOVER STATES */
-        .card:hover { 
-            z-index: 50; /* Traer al frente */
-            transform: translateY(-10px) scale(1.02); /* Escalar SUAVEMENTE sin rotar */
-        }
+        .card:hover { z-index: 50; transform: translateY(-10px) scale(1.02); }
         
         .card:hover .card-shine-wrapper {
             box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25); 
@@ -178,13 +170,12 @@
         
         .card:hover .card-shine-wrapper::after { left: 150%; transition: 0.7s; }
 
-        /* COLORS */
         .card.is-orange .card-shine-wrapper { background: rgba(255, 247, 237, 0.9); border: 2px solid #fdba74; }
         .card.is-orange .card-title { color: #9a3412; }
         .card.is-red .card-shine-wrapper { background: rgba(254, 242, 242, 0.9); border: 2px solid #fca5a5; opacity: 0.95; }
         .card.is-red .card-title { color: #991b1b; text-decoration: line-through; text-decoration-color: #fca5a5; }
 
-        /* BURBUJA FLOTANTE (Fuera del wrapper para no cortarse) */
+        /* BURBUJA FLOTANTE */
         .obs-bubble { 
             position: absolute; top: 10px; right: -230px; width: 220px; 
             background: #ffffff; border-radius: 16px; padding: 15px; 
@@ -202,12 +193,10 @@
         .obs-bubble.is-obs-red { border: 2px solid #fca5a5; color: #b91c1c; background: #fef2f2; }
         .obs-bubble.is-obs-red::before { border-right-color: #fca5a5; }
 
-        /* Activar burbuja al hover de la TARJETA principal */
         @media (min-width: 1100px) { 
             .card:hover .obs-bubble { opacity: 1; visibility: visible; transform: translateX(0) scale(1); } 
         }
 
-        /* Inner Elements */
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; position: relative; z-index: 2;}
         .badge { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 10px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; transition:0.3s;}
         .card:hover .badge { transform: scale(1.1); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
@@ -231,7 +220,6 @@
         .route-sep { color: #000; font-weight: 900; margin: 0 4px; font-size: 1.1em; display:inline-block; transition:0.3s; }
         .card:hover .route-sep { transform: scale(1.5); color: var(--primary); }
 
-        /* FAB PULSANTE */
         .fab { position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 90; animation: heartbeat 3s infinite; }
         @keyframes heartbeat { 0% { transform: scale(1); } 5% { transform: scale(1.1); } 10% { transform: scale(1); } 15% { transform: scale(1.1); } 20% { transform: scale(1); } 100% { transform: scale(1); } }
         .fab:hover { transform: scale(1.2) rotate(180deg); background: var(--primary); animation: none; box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.2); }
@@ -429,6 +417,11 @@
         const colors = [{bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'}, {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'}, {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}];
         function getColor(s) { if(!s) return colors[0]; let h=0; for(let i=0;i<s.length;i++)h+=s.charCodeAt(i); return colors[h%colors.length]; }
 
+        // --- FUNCIÓN DE NORMALIZACIÓN DE TEXTO (NUEVA) ---
+        function normalize(text) {
+            return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+        }
+
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
             const rawRuta = x.ruta || "";
@@ -521,9 +514,10 @@
                 </button>
             `;
 
-            const q = el.search.value.toLowerCase();
+            // --- USO DE NORMALIZE PARA BÚSQUEDA ---
+            const q = normalize(el.search.value);
             const results = db.map((x,i)=>({...x,i})).filter(x => {
-                const matchSearch = x.titulo.toLowerCase().includes(q) || x.descripcion.toLowerCase().includes(q);
+                const matchSearch = normalize(x.titulo).includes(q) || normalize(x.descripcion).includes(q);
                 const matchCat = filtro === "TODOS" || x.clasificacion === filtro;
                 const matchStatus = statusFilter === "ALL" || x.status === statusFilter;
                 return matchSearch && matchCat && matchStatus;
