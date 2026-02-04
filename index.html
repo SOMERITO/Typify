@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Smart Search)</title>
+    <title>Typify Pro (Flow Edition)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v68.0 (Smart Search & Stable Motion)
+           ESTILOS v68.6 (Reordered Modal)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -206,6 +206,7 @@
         .card:hover .actions { opacity: 1; transform: translateX(0) rotate(0); }
         .icon-btn { width: 42px; height: 42px; border-radius: 14px; border: none; background: #f1f5f9; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .icon-btn:hover { background: var(--primary); color: white; transform: rotate(15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
+        .icon-btn.link:hover { background: #3b82f6; color: white; transform: rotate(15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4); }
         .icon-btn.del:hover { background: #ef4444; color: white; transform: rotate(-15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4); }
 
         .desc-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 28px; margin-bottom: 20px; cursor: pointer; position: relative; transition: 0.4s; z-index: 2; }
@@ -333,21 +334,15 @@
     <div class="overlay" id="modalMain">
         <div class="modal">
             <h2 id="modalTitle" style="margin:0 0 30px 0; font-size:2rem; font-weight:800; color:#1e293b;">Nueva Tipificación</h2>
+            
             <div style="display:flex; gap:20px;">
                 <div class="input-group" style="flex:1"><label class="input-label">Clasificación</label><input id="inClass" class="input-field" placeholder="Ej: PASOS"></div>
                 <div class="input-group" style="flex:2"><label class="input-label">Título</label><input id="inTitle" class="input-field" placeholder="Título corto"></div>
             </div>
             <div class="input-group"><label class="input-label">Descripción</label><textarea id="inDesc" class="input-field" rows="4" placeholder="El texto que necesitas copiar..."></textarea></div>
-            <div class="input-group">
-                <label class="input-label">Estado de la Tipificación</label>
-                <div class="color-selector">
-                    <div id="cDef" class="color-circle c-default selected" onclick="selectColor('default')" title="Normal"></div>
-                    <div id="cOrg" class="color-circle c-orange" onclick="selectColor('orange')" title="Observación (Naranja)"></div>
-                    <div id="cRed" class="color-circle c-red" onclick="selectColor('red')" title="Error / No usar (Rojo)"></div>
-                </div>
-            </div>
-            <div class="input-group"><label class="input-label">¿Por qué este color? (Opcional)</label><input id="inObs" class="input-field" placeholder="Ej: Falta actualizar el script, error ortográfico..."></div>
+            
             <div class="input-group"><label class="input-label">Ruta / Sistema</label><input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación"></div>
+
             <div class="input-group">
                 <label class="input-label">🔗 Enlazar otras Tipificaciones (Opcional)</label>
                 <div class="link-control">
@@ -357,6 +352,22 @@
                 </div>
                 <div id="activeLinksArea" class="links-list"></div>
             </div>
+
+            <div class="input-group">
+                <label class="input-label">🌐 Enlace Web (Opcional)</label>
+                <input id="inWebLink" class="input-field" placeholder="Ej: https://google.com (Pega el link completo)">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Estado de la Tipificación</label>
+                <div class="color-selector">
+                    <div id="cDef" class="color-circle c-default selected" onclick="selectColor('default')" title="Normal"></div>
+                    <div id="cOrg" class="color-circle c-orange" onclick="selectColor('orange')" title="Observación (Naranja)"></div>
+                    <div id="cRed" class="color-circle c-red" onclick="selectColor('red')" title="Error / No usar (Rojo)"></div>
+                </div>
+            </div>
+            <div class="input-group"><label class="input-label">¿Por qué este color? (Opcional)</label><input id="inObs" class="input-field" placeholder="Ej: Falta actualizar el script, error ortográfico..."></div>
+
             <div class="modal-actions"><button class="btn btn-cancel" onclick="modalClose()">Cancelar</button><button id="btnSave" class="btn btn-confirm" onclick="saveData()">Guardar</button></div>
         </div>
     </div>
@@ -384,7 +395,14 @@
             res: document.getElementById('results'), sidebar: document.getElementById('sidebar'), sidebarContent: document.getElementById('sidebarContent'),
             preview: document.getElementById('previewCard'), prevTitle: document.getElementById('prevTitle'), prevBadge: document.getElementById('prevBadge'), prevDesc: document.getElementById('prevDesc'),
             modal: document.getElementById('modalMain'), modalDel: document.getElementById('modalDel'), toast: document.getElementById('toast'),
-            in: { c: document.getElementById('inClass'), t: document.getElementById('inTitle'), d: document.getElementById('inDesc'), r: document.getElementById('inRoute'), o: document.getElementById('inObs') },
+            in: { 
+                c: document.getElementById('inClass'), 
+                t: document.getElementById('inTitle'), 
+                d: document.getElementById('inDesc'), 
+                r: document.getElementById('inRoute'), 
+                o: document.getElementById('inObs'),
+                w: document.getElementById('inWebLink')
+            },
             cDef: document.getElementById('cDef'), cOrg: document.getElementById('cOrg'), cRed: document.getElementById('cRed'),
             linkInput: document.getElementById('inLinkInput'), linkList: document.getElementById('activeLinksArea'), datalist: document.getElementById('allTitles'),
             mTitle: document.getElementById('modalTitle'), btnSave: document.getElementById('btnSave')
@@ -417,7 +435,6 @@
         const colors = [{bg:'#e0e7ff',t:'#4338ca'}, {bg:'#dcfce7',t:'#15803d'}, {bg:'#ffedd5',t:'#c2410c'}, {bg:'#fee2e2',t:'#b91c1c'}, {bg:'#fae8ff',t:'#a21caf'}, {bg:'#ccfbf1',t:'#0f766e'}, {bg:'#fef9c3',t:'#a16207'}, {bg:'#f3e8ff',t:'#7e22ce'}, {bg:'#e0f2fe',t:'#0369a1'}];
         function getColor(s) { if(!s) return colors[0]; let h=0; for(let i=0;i<s.length;i++)h+=s.charCodeAt(i); return colors[h%colors.length]; }
 
-        // --- FUNCIÓN DE NORMALIZACIÓN DE TEXTO (NUEVA) ---
         function normalize(text) {
             return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
         }
@@ -436,7 +453,10 @@
             if(x.status === "red") { colorClass = "is-red"; obsClass = "is-obs-red"; }
             if(x.status && x.status !== 'default' && x.observacion) { obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`; }
 
-            // MODIFICACIÓN DE ESTRUCTURA: WRAPPER PARA SHINE, OUTER PARA BUBBLE
+            const webLinkBtn = x.webLink ? 
+                `<button class="icon-btn link" onclick="window.open('${x.webLink}', '_blank')" title="Abrir enlace web"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button>` 
+                : '';
+
             return `
             <div class="card ${colorClass}" style="animation-delay:${i*0.07}s">
                 <div class="card-shine-wrapper">
@@ -447,6 +467,7 @@
                             <div class="card-title">${x.titulo}</div>
                         </div>
                         <div class="actions">
+                            ${webLinkBtn}
                             <button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
                             <button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                         </div>
@@ -514,7 +535,6 @@
                 </button>
             `;
 
-            // --- USO DE NORMALIZE PARA BÚSQUEDA ---
             const q = normalize(el.search.value);
             const results = db.map((x,i)=>({...x,i})).filter(x => {
                 const matchSearch = normalize(x.titulo).includes(q) || normalize(x.descripcion).includes(q);
@@ -570,7 +590,8 @@
         window.modalOpen = (idx=-1) => { 
             editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; 
             const d=idx===-1?{}:db[idx]; 
-            el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||""; el.in.o.value=d.observacion||""; 
+            el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||""; el.in.o.value=d.observacion||"";
+            el.in.w.value = d.webLink || ""; 
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
             el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); 
             selectColor(d.status || 'default');
@@ -579,7 +600,16 @@
         
         window.modalClose = () => el.modal.classList.remove('active');
         window.saveData = async () => { 
-            const o = { clasificacion: el.in.c.value.trim().toUpperCase(), titulo: el.in.t.value.trim(), descripcion: el.in.d.value, ruta: el.in.r.value.trim(), links: currentLinks, status: tempColor, observacion: el.in.o.value.trim() }; 
+            const o = { 
+                clasificacion: el.in.c.value.trim().toUpperCase(), 
+                titulo: el.in.t.value.trim(), 
+                descripcion: el.in.d.value, 
+                ruta: el.in.r.value.trim(), 
+                links: currentLinks, 
+                status: tempColor, 
+                observacion: el.in.o.value.trim(),
+                webLink: el.in.w.value.trim() 
+            }; 
             if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); 
         };
         window.delAsk = i => { deleteIdx=i; el.modalDel.classList.add('active'); }; window.delClose = () => el.modalDel.classList.remove('active'); window.delConfirm = async () => { if(deleteIdx!==null){ db.splice(deleteIdx,1); delClose(); render(); await sync(); }};
