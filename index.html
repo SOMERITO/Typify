@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v69.0 (Multi-Link Web)
+           ESTILOS v69.1 (Multi-Link + BackToTop)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -239,6 +239,17 @@
         @keyframes heartbeat { 0% { transform: scale(1); } 5% { transform: scale(1.1); } 10% { transform: scale(1); } 15% { transform: scale(1.1); } 20% { transform: scale(1); } 100% { transform: scale(1); } }
         .fab:hover { transform: scale(1.2) rotate(180deg); background: var(--primary); animation: none; box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.2); }
         
+        /* BOTÓN VOLVER ARRIBA */
+        .fab-top { 
+            position: fixed; bottom: 125px; right: 40px; width: 70px; height: 70px; border-radius: 50%; 
+            background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 89;
+            opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.8);
+        }
+        .fab-top.visible { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+        .fab-top:hover { transform: scale(1.2) translateY(-5px); background: var(--primary); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.2); }
+
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px) scale(0.5); background: #0f172a; color: white; padding: 16px 35px; border-radius: 60px; font-weight: 700; opacity: 0; visibility: hidden; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2500; display: flex; align-items: center; gap: 12px; }
         #toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0) scale(1); }
 
@@ -342,9 +353,13 @@
         </main>
     </div>
 
+    <button id="btnTop" class="fab-top" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Volver al inicio">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
     <button class="fab" onclick="modalOpen()">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
+
     <div id="toast">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <span id="toastMsg">Copiado al portapapeles</span>
@@ -434,7 +449,20 @@
         };
 
         window.onload = () => { el.search.focus(); init(); };
-        window.addEventListener('scroll', () => { if (window.scrollY > 150) el.searchWrap.classList.add('docked'); else el.searchWrap.classList.remove('docked'); });
+        
+        // SCROLL LISTENER PARA BACK TO TOP Y SEARCH DOCK
+        window.addEventListener('scroll', () => { 
+            const scrollY = window.scrollY;
+            const btnTop = document.getElementById('btnTop');
+            
+            // Lógica Search Bar
+            if (scrollY > 150) el.searchWrap.classList.add('docked'); 
+            else el.searchWrap.classList.remove('docked');
+
+            // Lógica Back to Top
+            if (scrollY > 300) btnTop.classList.add('visible');
+            else btnTop.classList.remove('visible');
+        });
 
         async function init() {
             const t = setTimeout(() => { if(!db.length) { setStatus(false, "Modo Local"); db=localLoad(); el.loader.classList.add('hidden'); render(); }}, 5000);
