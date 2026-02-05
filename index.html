@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Stable Edition)</title>
+    <title>Typify Pro (Multi-Link Edition)</title>
     <link rel="icon" type="image/png" href="favicon.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v68.7 (Edición Blindada)
+           ESTILOS v69.0 (Multi-Link Web)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -151,7 +151,7 @@
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
             border-radius: 28px; padding: 35px; 
-            position: relative; overflow: hidden; /* Corta el shine */
+            position: relative; overflow: hidden; 
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.03); 
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -207,16 +207,21 @@
         .actions { display: flex; gap: 10px; opacity: 0; transform: translateX(20px) rotate(10deg); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .card:hover .actions { opacity: 1; transform: translateX(0) rotate(0); }
         
-        /* FIX DE SEGURIDAD: Usar etiqueta 'a' estilizada en lugar de 'button' */
         .icon-btn { 
             width: 42px; height: 42px; border-radius: 14px; border: none; background: #f1f5f9; color: #94a3b8; 
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            text-decoration: none; /* Asegura que no tenga subrayado al ser <a> */
+            text-decoration: none; position: relative;
         }
         .icon-btn:hover { background: var(--primary); color: white; transform: rotate(15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
         .icon-btn.link:hover { background: #3b82f6; color: white; transform: rotate(15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4); }
         .icon-btn.del:hover { background: #ef4444; color: white; transform: rotate(-15deg) scale(1.2); box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4); }
+        
+        .web-count-badge {
+            position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
+            font-size: 0.65rem; font-weight: 800; width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
 
         .desc-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 28px; margin-bottom: 20px; cursor: pointer; position: relative; transition: 0.4s; z-index: 2; }
         .desc-box:hover { background: #eff6ff; border-color: var(--primary); border-style: solid; box-shadow: 0 15px 35px -10px rgba(99, 102, 241, 0.25); transform: scale(1.02) translateY(-2px); }
@@ -269,6 +274,11 @@
         .links-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; min-height: 40px; }
         .link-pill { background: #e0e7ff; color: var(--primary); padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .link-pill:hover { background: #c7d2fe; transform: scale(1.1) rotate(-2deg); }
+        
+        /* ESTILO PARA CHIPS WEB (AZULES OSCURO) */
+        .link-pill.web { background: #dbeafe; color: #1e40af; }
+        .link-pill.web:hover { background: #bfdbfe; }
+
         .link-remove { cursor: pointer; font-weight: 900; opacity: 0.6; transition: 0.2s; }
         .link-remove:hover { opacity: 1; color: #ef4444; transform: scale(1.3); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 40px; }
@@ -353,18 +363,22 @@
             <div class="input-group"><label class="input-label">Ruta / Sistema</label><input id="inRoute" class="input-field" placeholder="Ej: Matrícula > Reanudación"></div>
 
             <div class="input-group">
-                <label class="input-label">🔗 Enlazar otras Tipificaciones (Opcional)</label>
+                <label class="input-label">🔗 Enlazar otras Tipificaciones</label>
                 <div class="link-control">
-                    <input id="inLinkInput" class="input-field" list="allTitles" placeholder="Busca por título para enlazar...">
+                    <input id="inLinkInput" class="input-field" list="allTitles" placeholder="Busca por título...">
                     <datalist id="allTitles"></datalist>
-                    <button class="btn-add-link" onclick="addLink()" title="Agregar sugerencia">+</button>
+                    <button class="btn-add-link" onclick="addLink()" title="Agregar">+</button>
                 </div>
                 <div id="activeLinksArea" class="links-list"></div>
             </div>
 
             <div class="input-group">
-                <label class="input-label">🌐 Enlace Web (Opcional)</label>
-                <input id="inWebLink" class="input-field" placeholder="Ej: https://google.com (Pega el link completo)">
+                <label class="input-label">🌐 Enlaces Web (Múltiples)</label>
+                <div class="link-control">
+                    <input id="inWebInput" class="input-field" placeholder="Ej: https://google.com">
+                    <button class="btn-add-link" onclick="addWebLink()" title="Agregar URL">+</button>
+                </div>
+                <div id="activeWebLinksArea" class="links-list"></div>
             </div>
 
             <div class="input-group">
@@ -394,7 +408,8 @@
         const BIN_ID = '6968712543b1c97be93195f1'; 
         const MASTER_KEY = '$2a$10$7PwFegDVLzoS8bJTQPdA7.27bk7D4odCTFnynWW1NkB5H6.PBt.nm';
         let db = []; let editIdx = -1; let filtro = "TODOS"; let deleteIdx = null;
-        let currentLinks = []; let searchTimeout = null; let tempColor = 'default'; let statusFilter = 'ALL';
+        let currentLinks = []; let currentWebLinks = []; 
+        let searchTimeout = null; let tempColor = 'default'; let statusFilter = 'ALL';
 
         const el = {
             loader: document.getElementById('loader'), status: document.getElementById('statusEl'), statusTxt: document.getElementById('statusTxt'),
@@ -409,11 +424,12 @@
                 t: document.getElementById('inTitle'), 
                 d: document.getElementById('inDesc'), 
                 r: document.getElementById('inRoute'), 
-                o: document.getElementById('inObs'),
-                w: document.getElementById('inWebLink')
+                o: document.getElementById('inObs')
             },
+            linkInput: document.getElementById('inLinkInput'), linkList: document.getElementById('activeLinksArea'), 
+            webInput: document.getElementById('inWebInput'), webList: document.getElementById('activeWebLinksArea'),
             cDef: document.getElementById('cDef'), cOrg: document.getElementById('cOrg'), cRed: document.getElementById('cRed'),
-            linkInput: document.getElementById('inLinkInput'), linkList: document.getElementById('activeLinksArea'), datalist: document.getElementById('allTitles'),
+            datalist: document.getElementById('allTitles'),
             mTitle: document.getElementById('modalTitle'), btnSave: document.getElementById('btnSave')
         };
 
@@ -448,6 +464,22 @@
             return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
         }
 
+        /* FUNCIÓN MÁGICA PARA ABRIR MULTIPLES LINKS */
+        window.openLinks = (idx) => {
+            const item = db[idx];
+            // Migración en vuelo: Si tiene webLink antiguo, lo convertimos temporalmente a array
+            const urls = item.webLinks && item.webLinks.length > 0 ? item.webLinks : (item.webLink ? [item.webLink] : []);
+            
+            if(urls.length === 0) return toast("No hay enlaces guardados");
+
+            // Abrimos cada URL
+            urls.forEach(url => {
+                window.open(url, '_blank');
+            });
+            
+            if(urls.length > 1) toast(`Abriendo ${urls.length} enlaces...`);
+        }
+
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
             const rawRuta = x.ruta || "";
@@ -462,11 +494,14 @@
             if(x.status === "red") { colorClass = "is-red"; obsClass = "is-obs-red"; }
             if(x.status && x.status !== 'default' && x.observacion) { obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`; }
 
-            // CORRECCIÓN DE SEGURIDAD: Usar <a> en lugar de <button onclick>
-            const webLinkBtn = x.webLink ? 
-                `<a href="${x.webLink}" target="_blank" class="icon-btn link" title="Abrir enlace web">
+            // Lógica para detectar enlaces (Nuevos o Antiguos)
+            const countWeb = (x.webLinks && x.webLinks.length) || (x.webLink ? 1 : 0);
+            
+            const webBtn = countWeb > 0 ? 
+                `<button class="icon-btn link" onclick="openLinks(${i})" title="Abrir ${countWeb} enlace(s)">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </a>` 
+                    ${countWeb > 1 ? `<span class="web-count-badge">${countWeb}</span>` : ''}
+                </button>` 
                 : '';
 
             return `
@@ -479,7 +514,7 @@
                             <div class="card-title">${x.titulo}</div>
                         </div>
                         <div class="actions">
-                            ${webLinkBtn}
+                            ${webBtn}
                             <button class="icon-btn" onclick="modalOpen(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
                             <button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                         </div>
@@ -592,10 +627,16 @@
             if(c === 'red') el.cRed.classList.add('selected');
         };
 
+        // GESTIÓN DE ENLACES INTERNOS
         window.addLink = () => { const val = el.linkInput.value.trim(); if(val && !currentLinks.includes(val)) { currentLinks.push(val); renderLinksList(); el.linkInput.value = ''; }};
         window.removeLink = (val) => { currentLinks = currentLinks.filter(l => l !== val); renderLinksList(); };
         function renderLinksList() { el.linkList.innerHTML = currentLinks.map(l => `<span class="link-pill">${l} <span class="link-remove" onclick="removeLink('${l}')">✕</span></span>`).join(''); }
-        
+
+        // GESTIÓN DE ENLACES WEB (NUEVO)
+        window.addWebLink = () => { const val = el.webInput.value.trim(); if(val && !currentWebLinks.includes(val)) { currentWebLinks.push(val); renderWebLinksList(); el.webInput.value = ''; }};
+        window.removeWebLink = (val) => { currentWebLinks = currentWebLinks.filter(l => l !== val); renderWebLinksList(); };
+        function renderWebLinksList() { el.webList.innerHTML = currentWebLinks.map(l => `<span class="link-pill web">${l.length > 25 ? l.substring(0,25)+'...' : l} <span class="link-remove" onclick="removeWebLink('${l}')">✕</span></span>`).join(''); }
+
         function escapeHtml(t) { return t.replace(/'/g, "\\'"); } window.copy = t => { navigator.clipboard.writeText(t); toast("¡Copiado!"); };
         function toast(m) { document.getElementById('toastMsg').innerText = m; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
         
@@ -603,8 +644,20 @@
             editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; 
             const d=idx===-1?{}:db[idx]; 
             el.in.c.value=d.clasificacion||""; el.in.t.value=d.titulo||""; el.in.d.value=d.descripcion||""; el.in.r.value=d.ruta||""; el.in.o.value=d.observacion||"";
-            el.in.w.value = d.webLink || ""; 
+            
+            // Cargar enlaces internos
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
+
+            // Cargar enlaces web (migración automática si existe antiguo)
+            if (d.webLinks && Array.isArray(d.webLinks)) {
+                currentWebLinks = [...d.webLinks];
+            } else if (d.webLink) {
+                currentWebLinks = [d.webLink];
+            } else {
+                currentWebLinks = [];
+            }
+            renderWebLinksList();
+
             el.datalist.innerHTML = db.map(x => `<option value="${x.titulo}">`).join(''); 
             selectColor(d.status || 'default');
             el.modal.classList.add('active'); setTimeout(()=>el.in.c.focus(), 100); 
@@ -618,9 +671,10 @@
                 descripcion: el.in.d.value, 
                 ruta: el.in.r.value.trim(), 
                 links: currentLinks, 
+                webLinks: currentWebLinks, // Guardamos el array nuevo
+                webLink: currentWebLinks.length > 0 ? currentWebLinks[0] : "", // Compatibilidad hacia atrás
                 status: tempColor, 
-                observacion: el.in.o.value.trim(),
-                webLink: el.in.w.value.trim() 
+                observacion: el.in.o.value.trim()
             }; 
             if(!o.titulo) return alert("Falta título"); editIdx===-1?db.unshift(o):db[editIdx]=o; modalClose(); render(); await sync(); 
         };
