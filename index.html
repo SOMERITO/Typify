@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Multi-Link Edition)</title>
+    <title>Typify Pro (Final Edition)</title>
     <link rel="icon" type="image/png" href="favicon.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v69.1 (Multi-Link + BackToTop)
+           ESTILOS v69.2 (Final Stable)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -492,17 +492,17 @@
             return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
         }
 
-        /* FUNCIÓN MÁGICA PARA ABRIR MULTIPLES LINKS */
+        /* FUNCIÓN MÁGICA PARA ABRIR MULTIPLES LINKS (MEJORADA) */
         window.openLinks = (idx) => {
             const item = db[idx];
-            // Migración en vuelo: Si tiene webLink antiguo, lo convertimos temporalmente a array
             const urls = item.webLinks && item.webLinks.length > 0 ? item.webLinks : (item.webLink ? [item.webLink] : []);
             
             if(urls.length === 0) return toast("No hay enlaces guardados");
 
-            // Abrimos cada URL
             urls.forEach(url => {
-                window.open(url, '_blank');
+                // INTENTO DE MEJORA: Forzar foco en la nueva ventana
+                const newWin = window.open(url, '_blank');
+                if (newWin) newWin.focus();
             });
             
             if(urls.length > 1) toast(`Abriendo ${urls.length} enlaces...`);
@@ -522,7 +522,6 @@
             if(x.status === "red") { colorClass = "is-red"; obsClass = "is-obs-red"; }
             if(x.status && x.status !== 'default' && x.observacion) { obsHTML = `<div class="obs-bubble ${obsClass}">${x.observacion}</div>`; }
 
-            // Lógica para detectar enlaces (Nuevos o Antiguos)
             const countWeb = (x.webLinks && x.webLinks.length) || (x.webLink ? 1 : 0);
             
             const webBtn = countWeb > 0 ? 
