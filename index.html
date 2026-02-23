@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typify Pro (Final Edition)</title>
+    <title>Typify Pro (Smart Link Edition)</title>
     <link rel="icon" type="image/png" href="favicon.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v69.2 (Final Stable)
+           ESTILOS v69.4 (Fix Copiado)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -492,21 +492,35 @@
             return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
         }
 
-        /* FUNCIÓN MÁGICA PARA ABRIR MULTIPLES LINKS (MEJORADA) */
+        /* FUNCIÓN MÁGICA: ABRE Y COPIA AL MISMO TIEMPO */
         window.openLinks = (idx) => {
             const item = db[idx];
             const urls = item.webLinks && item.webLinks.length > 0 ? item.webLinks : (item.webLink ? [item.webLink] : []);
             
             if(urls.length === 0) return toast("No hay enlaces guardados");
 
+            if (urls.length > 0) {
+                 navigator.clipboard.writeText(urls[0]);
+                 toast("Enlace copiado y abriendo...");
+            }
+
             urls.forEach(url => {
-                // INTENTO DE MEJORA: Forzar foco en la nueva ventana
                 const newWin = window.open(url, '_blank');
                 if (newWin) newWin.focus();
             });
-            
-            if(urls.length > 1) toast(`Abriendo ${urls.length} enlaces...`);
         }
+
+        /* NUEVA FUNCIÓN DE COPIADO MÁS SEGURA */
+        window.copyDesc = (idx) => {
+            const item = db[idx];
+            if (item && item.descripcion) {
+                navigator.clipboard.writeText(item.descripcion);
+                toast("¡Copiado!");
+            }
+        };
+
+        function escapeHtml(t) { return t.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n'); } 
+        function toast(m) { document.getElementById('toastMsg').innerText = m; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
 
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
@@ -525,12 +539,13 @@
             const countWeb = (x.webLinks && x.webLinks.length) || (x.webLink ? 1 : 0);
             
             const webBtn = countWeb > 0 ? 
-                `<button class="icon-btn link" onclick="openLinks(${i})" title="Abrir ${countWeb} enlace(s)">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                `<button class="icon-btn link" onclick="openLinks(${i})" title="Abrir y Copiar Enlace">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     ${countWeb > 1 ? `<span class="web-count-badge">${countWeb}</span>` : ''}
                 </button>` 
                 : '';
 
+            /* AQUI CAMBIAMOS onclick="copy(...)" por onclick="copyDesc(${i})" */
             return `
             <div class="card ${colorClass}" style="animation-delay:${i*0.07}s">
                 <div class="card-shine-wrapper">
@@ -546,7 +561,7 @@
                             <button class="icon-btn del" onclick="delAsk(${x.i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                         </div>
                     </div>
-                    <div class="desc-box" onclick="copy('${escapeHtml(x.descripcion)}')">
+                    <div class="desc-box" onclick="copyDesc(${i})">
                         <div class="tooltip-copy">CLICK PARA COPIAR</div>
                         <pre class="desc-text">${x.descripcion}</pre>
                     </div>
@@ -659,14 +674,11 @@
         window.removeLink = (val) => { currentLinks = currentLinks.filter(l => l !== val); renderLinksList(); };
         function renderLinksList() { el.linkList.innerHTML = currentLinks.map(l => `<span class="link-pill">${l} <span class="link-remove" onclick="removeLink('${l}')">✕</span></span>`).join(''); }
 
-        // GESTIÓN DE ENLACES WEB (NUEVO)
+        // GESTIÓN DE ENLACES WEB
         window.addWebLink = () => { const val = el.webInput.value.trim(); if(val && !currentWebLinks.includes(val)) { currentWebLinks.push(val); renderWebLinksList(); el.webInput.value = ''; }};
         window.removeWebLink = (val) => { currentWebLinks = currentWebLinks.filter(l => l !== val); renderWebLinksList(); };
         function renderWebLinksList() { el.webList.innerHTML = currentWebLinks.map(l => `<span class="link-pill web">${l.length > 25 ? l.substring(0,25)+'...' : l} <span class="link-remove" onclick="removeWebLink('${l}')">✕</span></span>`).join(''); }
 
-        function escapeHtml(t) { return t.replace(/'/g, "\\'"); } window.copy = t => { navigator.clipboard.writeText(t); toast("¡Copiado!"); };
-        function toast(m) { document.getElementById('toastMsg').innerText = m; el.toast.classList.add('visible'); setTimeout(()=>el.toast.classList.remove('visible'), 2000); }
-        
         window.modalOpen = (idx=-1) => { 
             editIdx = idx; el.mTitle.innerText = idx===-1?"Nueva Tipificación":"Editar Registro"; el.btnSave.innerText=idx===-1?"Crear":"Guardar Cambios"; 
             const d=idx===-1?{}:db[idx]; 
@@ -675,7 +687,7 @@
             // Cargar enlaces internos
             currentLinks = (d.links && Array.isArray(d.links)) ? [...d.links] : []; renderLinksList(); 
 
-            // Cargar enlaces web (migración automática si existe antiguo)
+            // Cargar enlaces web
             if (d.webLinks && Array.isArray(d.webLinks)) {
                 currentWebLinks = [...d.webLinks];
             } else if (d.webLink) {
@@ -698,8 +710,8 @@
                 descripcion: el.in.d.value, 
                 ruta: el.in.r.value.trim(), 
                 links: currentLinks, 
-                webLinks: currentWebLinks, // Guardamos el array nuevo
-                webLink: currentWebLinks.length > 0 ? currentWebLinks[0] : "", // Compatibilidad hacia atrás
+                webLinks: currentWebLinks, 
+                webLink: currentWebLinks.length > 0 ? currentWebLinks[0] : "", 
                 status: tempColor, 
                 observacion: el.in.o.value.trim()
             }; 
