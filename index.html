@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v69.4.1 (Rutas Interactivas)
+           ESTILOS v69.4.2 (Rutas Interactivas + Copy All)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -252,6 +252,19 @@
         
         .route-sep { color: #94a3b8; font-weight: 900; font-size: 0.9rem; transition: 0.3s; }
         .card:hover .route-sep { color: var(--primary); transform: scale(1.2); }
+
+        /* BOTÓN PARA COPIAR RUTA COMPLETA */
+        .btn-copy-route {
+            background: transparent; border: 1px solid transparent; color: #94a3b8;
+            width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            margin-left: 5px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-copy-route:hover {
+            background: #f1f5f9; color: var(--primary); border-color: #cbd5e1;
+            transform: scale(1.1) rotate(5deg);
+        }
+        .btn-copy-route:active { transform: scale(0.95); }
 
         .fab { position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; border-radius: 50%; background: var(--text-main); color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 90; animation: heartbeat 3s infinite; }
         @keyframes heartbeat { 0% { transform: scale(1); } 5% { transform: scale(1.1); } 10% { transform: scale(1); } 15% { transform: scale(1.1); } 20% { transform: scale(1); } 100% { transform: scale(1); } }
@@ -549,21 +562,25 @@
         function createCard(x, i) {
             const c = getColor(x.clasificacion); 
             
-            /* LÓGICA PARA BOTONES DE RUTA */
+            /* LÓGICA PARA BOTONES DE RUTA + BOTÓN COPIAR TODO */
             const rawRuta = x.ruta || "";
             let rutaHTML = "";
             if (rawRuta) {
-                // Separa la ruta usando el símbolo ">", limpia los espacios alrededor de cada palabra
                 const parts = rawRuta.split('>').map(p => p.trim()).filter(p => p);
                 
-                // Genera el HTML de los botones
                 const buttonsHTML = parts.map(p => 
                     `<button class="route-btn" title="Copiar: ${escapeHtml(p)}" onclick="copyText('${escapeHtml(p)}')">
                         ${escapeHtml(p)}
                     </button>`
                 ).join('<span class="route-sep">></span>');
                 
-                rutaHTML = `<div class="route-container">${buttonsHTML}</div>`;
+                const copyAllBtn = `
+                    <button class="btn-copy-route" title="Copiar ruta completa" onclick="copyText('${escapeHtml(rawRuta)}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                `;
+
+                rutaHTML = `<div class="route-container">${buttonsHTML} ${copyAllBtn}</div>`;
             }
             
             const hasLinks = x.links && x.links.length > 0;
