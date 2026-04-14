@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           ESTILOS v69.4.2 (Rutas Interactivas + Copy All)
+           ESTILOS v69.4.3 (Copy All a la derecha y más grande)
            ========================================= */
         :root {
             --primary: #6366f1;
@@ -234,6 +234,7 @@
         .route-container { 
             display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 15px; padding-left: 5px; 
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            width: 100%; box-sizing: border-box;
         }
         .card:hover .route-container { transform: translateX(5px); }
         
@@ -253,12 +254,13 @@
         .route-sep { color: #94a3b8; font-weight: 900; font-size: 0.9rem; transition: 0.3s; }
         .card:hover .route-sep { color: var(--primary); transform: scale(1.2); }
 
-        /* BOTÓN PARA COPIAR RUTA COMPLETA */
+        /* BOTÓN PARA COPIAR RUTA COMPLETA (A la derecha y más grande) */
         .btn-copy-route {
             background: transparent; border: 1px solid transparent; color: #94a3b8;
-            width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+            width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            margin-left: 5px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-left: auto; /* Esto lo empuja hacia la derecha del todo */
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .btn-copy-route:hover {
             background: #f1f5f9; color: var(--primary); border-color: #cbd5e1;
@@ -576,7 +578,7 @@
                 
                 const copyAllBtn = `
                     <button class="btn-copy-route" title="Copiar ruta completa" onclick="copyText('${escapeHtml(rawRuta)}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 `;
 
